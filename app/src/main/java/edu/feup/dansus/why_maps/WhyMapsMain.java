@@ -155,7 +155,7 @@ public class WhyMapsMain extends AppCompatActivity
 
         // Adding a pre-defined marker
         map.addMarker(new MarkerOptions().position(porto)
-        .title("Porto"));
+        .title("okokok"));
 
         /////////////////////////////////////
         // Add a marker for all events in DB
