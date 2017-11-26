@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">WHY-Maps</string>
+    <string name="app_name">Why</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -9,4 +9,13 @@
     <string name="google_maps_api_key">AIzaSyDOxq8kceDn-c6SJleULeAorHao2wAi2pA</string>
     <string name="simulate_event">Manually Trigger Event</string>
     <string name="bluetooth_devices">Bluetooth connection</string>
+
+    <string name="ContextDrawer">Context monitor</string>
+    <string name="EventsDrawer">Events</string>
+    <string name="DevicesDrawer">Devices</string>
+    <string name="SummaryDrawer">Summary Report</string>
+    <string name="SettingsDrawer">Settings</string>
+    <string name="HelpDrawer">Help</string>
+    <string name="AboutDrawer">About</string>
+    <string name="EmptyMessage">Screen yet to be implemented.</string>
 </resources>

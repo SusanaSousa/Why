@@ -34,7 +34,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_USER_AGE = "age";
     private static final String KEY_USER_THRESH = "userthresh";
 
-    //Table Events columns
+    //Table EventsFrag columns
     private static final String KEY_EVENT_USER_ID_FK = "userId";
     private static final String KEY_EVENT_ID = "eventID";
     private static final String KEY_EVENT_DATE = "date_time";
