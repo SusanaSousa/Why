@@ -21,15 +21,18 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 
 public class WhyMapsMain extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
@@ -102,7 +105,7 @@ public class WhyMapsMain extends AppCompatActivity
         sampleEvent2.user=sampleUser2;
         sampleEvent2.duration = time2;
         sampleEvent2.bodyTemp = 38;
-        sampleEvent2.date = date;
+        sampleEvent2.date = date2;
         sampleEvent2.latitude =41.177063;
         sampleEvent2.longitude = -8.594091;
         sampleEvent2.timeRR = 8;
@@ -117,7 +120,7 @@ public class WhyMapsMain extends AppCompatActivity
         sampleEvent3.user=sampleUser;
         sampleEvent3.duration = time3;
         sampleEvent3.bodyTemp = 35;
-        sampleEvent3.date = date;
+        sampleEvent3.date = date3;
         sampleEvent3.latitude = 41.176412;
         sampleEvent3.longitude = -8.603869;
         sampleEvent3.timeRR = 4;
@@ -126,14 +129,13 @@ public class WhyMapsMain extends AppCompatActivity
 
         events = db.getAllEvents();
 
-        events.get(0);
-        for (Event event : events) {
-            // do something
-        }
+
     }
 
     @Override
     public void onMapReady(GoogleMap map){
+
+        map.setInfoWindowAdapter(new WindowAdapter(getLayoutInflater(),events));
         // Location information
         LatLng porto = new LatLng(41.177605, -8.596285);
 
@@ -160,7 +162,8 @@ public class WhyMapsMain extends AppCompatActivity
         /////////////////////////////////////
         // Add a marker for all events in DB
         for (int i=0; i<eventLoc.size();i++){
-            map.addMarker(new MarkerOptions().position(eventLoc.get(i)).title("Event "+i));
+           map.addMarker(new MarkerOptions().position(eventLoc.get(i)).title("Event "+i));
+
         }
 
 
@@ -169,6 +172,10 @@ public class WhyMapsMain extends AppCompatActivity
 
         // Zooming it a little bit
         map.moveCamera(CameraUpdateFactory.zoomTo(15)); // zoom level 15 gives street-level detail
+
+        //set Info Window Adapter
+
+
     }
 
     @Override

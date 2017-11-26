@@ -9,4 +9,10 @@
     <string name="google_maps_api_key">AIzaSyDOxq8kceDn-c6SJleULeAorHao2wAi2pA</string>
     <string name="simulate_event">Manually Trigger Event</string>
     <string name="bluetooth_devices">Bluetooth connection</string>
+    <string name="eventOn_tv">Event on</string>
+    <string name="eventDate_tv">oi</string>
+    <string name="duration_tv">Duration:</string>
+    <string name="heartRate_tv">Heart Rate:</string>
+    <string name="cameras_tv">Cameras</string>
+    <string name="notes_bt">ADD NOTES</string>
 </resources>

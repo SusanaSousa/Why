@@ -7,9 +7,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.sql.Date;
 import java.sql.Time;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static android.content.ContentValues.TAG;
 
@@ -101,7 +105,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put(KEY_EVENT_USER_ID_FK, userId);
             //values.put(KEY_EVENT_IMAGE, event.photo);
-            values.put(KEY_EVENT_DATE, event.date.toString());
+            values.put(KEY_EVENT_DATE, formatDateToString(event.date));
             values.put(KEY_EVENT_GPS_LAT , event.latitude);
             values.put(KEY_EVENT_GPS_LONG, event.longitude);
             values.put(KEY_EVENT_RR, event.timeRR);
@@ -119,29 +123,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-    // Adding new user
-    void addUser(User user) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_USER_ID, user.getUserID());
-        values.put(KEY_USER_NAME, user.getUsername());
-        values.put(KEY_USER_AGE, user.getUserAge());
-        values.put(KEY_USER_PROF, user.getUserProfession());
-        values.put(KEY_USER_THRESH, user.getUserThreshold());
-
-        // Inserting Row
-        try {
-            db.insert(TABLE_USERS, null, values);
-            db.close(); // Closing database connection
-
-        } catch (Exception e) {
-
-            Log.d(TAG, "Error adding just a user");
-
-
-        }
-    }
 
     public long addOrUpdateUser(User user) {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
@@ -220,7 +201,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     newEvent.eventID=Integer.parseInt(cursor.getString(cursor.getColumnIndex(KEY_EVENT_ID)));
                     newEvent.duration= Time.valueOf(cursor.getString(cursor.getColumnIndex(KEY_EVENT_DUR)));
                     newEvent.bodyTemp=Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_EVENT_TEMP)));
-                   // newEvent.date=(cursor.getString(cursor.getColumnIndex(KEY_EVENT_DATE)));
+                    newEvent.date=formatStringtToDate(cursor.getString(cursor.getColumnIndex(KEY_EVENT_DATE)));
                     newEvent.latitude=Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_EVENT_GPS_LAT)));
                     newEvent.longitude=Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_EVENT_GPS_LONG)));
                     newEvent.timeRR = Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_EVENT_RR)));
@@ -237,5 +218,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
         }
         return events;
+    }
+
+    private String formatDateToString (java.util.Date date){
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "EEE, d 'of' MMM, HH:mm", Locale.US);
+        return dateFormat.format(date);
+
+    }
+
+    private java.util.Date formatStringtToDate (String sdate) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "EEE, d 'of' MMM, HH:mm", Locale.US);
+        return dateFormat.parse(sdate);
     }
 }
