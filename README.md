@@ -1,6 +1,6 @@
 # WHY: Physiology-triggered multi-modal context gatherer
 
-_Mobile Computing in Biomedical Engineering - CMEB_
+_Mobile Computing in Biomedical Engineering | CMEB | FEUP | Porto, Portugal_
 
 
 Nowadays, context awareness is everywhere in our lives. Our smartphones are equipped with an exhaustive array of sensorization options (some of them continuously monitoring) and the convergence of the wearables and miniaturization trends allows for even more (and, sometimes, more invasive) sensors to be cheaply available in comfortable, ready-to-use packages. The use of these devices (fitness bands, heart rate monitors, EDA monitors, blood pressure monitors) is becoming more and more common, especially within the newer generations, born and bred in technology.
@@ -30,3 +30,4 @@ Obviously, in construction:
 
 _Exhilarated, were we go, embarking on the most daunting and challenging, yet highly rewarding of the quests: the quest for *WHY*._
 
+Susana Sousa | Daniel Rodrigues
