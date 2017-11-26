@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single"
+        android:id="@+id/iconGroup">
+        <item
+            android:id="@+id/context_nav"
+            android:icon="@drawable/ic_remove_red_eye_black_24dp"
+            android:iconTint="@color/darkGrey"
+            android:title="Context monitor" />
+        <item
+            android:id="@+id/events_nav"
+            android:icon="@drawable/ic_view_list_black_24dp"
+            android:iconTint="@color/darkGrey"
+            android:title="Events" />
+        <item
+            android:id="@+id/devices_nav"
+            android:icon="@drawable/ic_bluetooth_audio_black_24dp"
+            android:iconTint="@color/darkGrey"
+            android:title="Devices" />
+        <item
+            android:id="@+id/report_nav"
+            android:icon="@drawable/ic_menu_manage"
+            android:iconTint="@color/darkGrey"
+            android:title="Summary Report" />
+        <item
+            android:id="@+id/settings_nav"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:iconTint="@color/darkGrey"
+            android:title="Settings" />
+
+    </group>
+
+    <group
+        android:id="@+id/iconlessgroup">
+        <item
+            android:id="@+id/help_nav"
+            android:title="Help" />
+        <item
+            android:id="@+id/about_nav"
+            android:title="About" />
+    </group>
+
+</menu>
