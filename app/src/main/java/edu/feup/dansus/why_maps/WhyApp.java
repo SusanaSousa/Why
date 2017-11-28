@@ -16,6 +16,7 @@ import java.util.List;
 public class WhyApp extends Application {
 
     public static List<Event> events = new ArrayList<>(); // EventsFrag extracted from the DB
+    public static final String VJ_ADDRESS = "00:23:FE:00:0B:54";
 
     @Override
     public void onCreate() {
@@ -66,7 +67,6 @@ public class WhyApp extends Application {
         db.addEvent(sampleEvent2);
 
         // Create sample data
-
         Event sampleEvent3 = new Event();
         Time time3 = new Time(20);
         Date date3 = new Date();
@@ -81,5 +81,6 @@ public class WhyApp extends Application {
         db.addEvent(sampleEvent3);
 
         events = db.getAllEvents();
+        db.close();
     }
 }

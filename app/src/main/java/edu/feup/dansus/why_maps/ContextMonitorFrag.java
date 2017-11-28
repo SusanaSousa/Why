@@ -1,46 +1,31 @@
 package edu.feup.dansus.why_maps;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Camera;
-import android.graphics.Canvas;
-import android.graphics.drawable.VectorDrawable;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationManager;
-import android.os.Build;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
+import android.os.Handler;
+import android.os.Message;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import static android.content.ContentValues.TAG;
+import Bio.Library.namespace.BioLib;
 
 /**
  * Created by dany on 26-11-2017.
@@ -51,11 +36,25 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback {
     private SupportMapFragment mapFragment; // Map will be a fragment
     private GoogleMap mMap;
     private List<Event> mEvents = new ArrayList<>(); // Array pointing to the global events array
+    private DatabaseHandler dbHandler;
+    private BluetoothDevice deviceToConnect;
+    private boolean connectionState=false;
+    private BioLib lib = null;
     private WhyApp app;
+    private final static int NUM_SAMPLES = 5;
+    private boolean isMonitoring = false;
+    private FloatingActionButton playBtn;
+
+    //Buffer
+    // CircularFifoQueue<Integer> queue = new CircularFifoQueue(5); //buffering data
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View view = inflater.inflate(R.layout.context_monitor_layout, container, false);
+
+        // Getting a reference to the activity's DB Handler
+        dbHandler = new DatabaseHandler(this.getActivity());
 
         // Getting a reference to the global events list
         app = (WhyApp) getActivity().getApplicationContext();
@@ -67,13 +66,67 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback {
             mapFragment.getMapAsync(this);
         }
 
+        // Initializing BioLib library
+        try
+        {
+            lib = new BioLib(this.getActivity(), mHandler);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        // So we can handle action bar clicks from the fragment
+        setHasOptionsMenu(true);
+
+        // Instantiating and configuring the play button
+        playBtn = (FloatingActionButton) view.findViewById(R.id.playButton);
+        playBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (isMonitoring == false){
+                    isMonitoring = true;
+                    playBtn.setImageResource(R.drawable.ic_pause_black_24dp);
+                } else {
+                    isMonitoring = false;
+                    playBtn.setImageResource(R.drawable.ic_fiber_manual_record_black_24dp);
+                }
+            }
+        });
+
+
         return view;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_bluetooth: {
+
+                // Firstly, checking if Bluetooth is enabled and asking user to enable it in case it's not
+                if (!isBluetoothEnabled()) {
+                    AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+                    alertDialog.setTitle(R.string.AlertTitle);
+                    alertDialog.setMessage(getString(R.string.AlertText));
+                    alertDialog.show();
+                } else {
+                    if (connectionState == false) {
+                        Connect(item);
+                    } else {
+                        Disconnect(item);
+                    }
+                }
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public void onMapReady(GoogleMap map){ // Map is ready!
         mMap = map;
+
+        map.setInfoWindowAdapter(new EventMapAdapter(getLayoutInflater(),mEvents));
 
         //Getting location information from all events in DB (assuming that they belong to the same user.
         final List<LatLng> eventLoc = new ArrayList<LatLng>();
@@ -100,6 +153,8 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback {
                     .position(eventLoc.get(i))
                     .title("Event "+ i)); // TODO: custom marker
         }
+
+        //
 
         // Updating and zooming in on the current location
         // getDeviceLocation();
@@ -154,4 +209,96 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback {
         } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         } */
+
+    /**
+     * The Handler that gets information back from the BioLib
+     */
+    private final Handler mHandler = new Handler()
+    {
+        @Override
+        public void handleMessage(Message msg)
+        {
+            switch (msg.what)
+            {
+                case BioLib.MESSAGE_PUSH_BUTTON:
+                    Date DATETIME_PUSH_BUTTON = (Date)msg.obj;
+                    int numOfPushButton = msg.arg1;
+                    Log.i("PUSH-BUTTON", "numOfPushButton" + numOfPushButton + DATETIME_PUSH_BUTTON);
+
+                    break;
+
+
+                case BioLib.MESSAGE_PEAK_DETECTION:
+                    BioLib.QRS qrs = (BioLib.QRS)msg.obj;
+                    Log.i("HR Info", "PEAK: " + qrs.position + "  BPMi: " + qrs.bpmi + " bpm  BPM: " + qrs.bpm + " bpm  R-R: " + qrs.rr + " ms");
+
+                    if (qrs.bpm > 170){
+                        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+                        alertDialog.setTitle("Alert");
+                        alertDialog.setMessage("Alert message to be shown");
+                        alertDialog.show();
+                    }
+
+            }
+        }
+    };
+
+    /***
+     * Connect to device.
+     */
+    private void Connect(MenuItem item) {
+        try {
+            deviceToConnect = lib.mBluetoothAdapter.getRemoteDevice(app.VJ_ADDRESS);
+            lib.Connect(app.VJ_ADDRESS, NUM_SAMPLES);
+            connectionState = true;
+            item.setIcon(R.drawable.ic_bluetooth_connected_black_24dp); // Updating the action bar icon
+            Snackbar.make(getView(), getString(R.string.SuccessfulConnection)+" "+deviceToConnect.getName(), Snackbar.LENGTH_LONG).show();
+            playBtn.setVisibility(View.VISIBLE); // Showing record button
+        } catch (Exception e) {
+            e.printStackTrace();
+            Snackbar.make(getView(), R.string.NoConnection, Snackbar.LENGTH_LONG).show();
+        }
+    }
+    /***
+     * Disconnect from device.
+     */
+    private void Disconnect(MenuItem item)
+    {
+        try
+        {
+            lib.Disconnect();
+            connectionState = false;
+            item.setIcon(R.drawable.ic_bluetooth_black_24dp); // Updating the action
+            Snackbar.make(getView(), R.string.SuccessDisc, Snackbar.LENGTH_SHORT).show();
+            playBtn.setVisibility(View.INVISIBLE); // Hiding record button
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Snackbar.make(getView(), R.string.NoDisc, Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    private double calculateAverage(ArrayList <Integer> marks) {
+        // Source: https://stackoverflow.com/questions/10791568/calculating-average-of-an-array-list
+
+        if (marks == null || marks.isEmpty()) {
+            return 0;
+        }
+
+        double sum = 0;
+        for (Integer mark : marks) {
+            sum += mark;
+        }
+
+        return sum / marks.size();
+    }
+
+    private boolean isBluetoothEnabled()
+    {
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        return mBluetoothAdapter.isEnabled();
+
+    }
+
     }

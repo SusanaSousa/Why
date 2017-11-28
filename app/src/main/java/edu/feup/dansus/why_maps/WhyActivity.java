@@ -163,6 +163,8 @@ public class WhyActivity extends AppCompatActivity {
     }
 
 
+
+
     // Handling the permission request reply by the user
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -192,5 +194,6 @@ public class WhyActivity extends AppCompatActivity {
 
             fragMan.beginTransaction().replace(R.id.frag_accepter, frag).commit();
         }
+
 
     }

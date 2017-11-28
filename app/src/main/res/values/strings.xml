@@ -18,4 +18,16 @@
     <string name="HelpDrawer">Help</string>
     <string name="AboutDrawer">About</string>
     <string name="EmptyMessage">Screen yet to be implemented.</string>
+    <string name="SuccessfulConnection">Successfully connected to VitalJacket</string>
+    <string name="NoConnection">Error connecting to VitalJacket</string>
+    <string name="eventOn_tv">Event on</string>
+    <string name="eventDate_tv">Date</string>
+    <string name="duration_tv">Duration:</string>
+    <string name="heartRate_tv">Heart Rate:</string>
+    <string name="cameras_tv">Cameras</string>
+    <string name="notes_bt">ADD NOTES</string>
+    <string name="SuccessDisc">Successfully disconnected from VitalJacket</string>
+    <string name="NoDisc">Error disconnecting from VitalJacket</string>
+    <string name="AlertTitle">Bluetooth connectivity</string>
+    <string name="AlertText">Please enable Bluetooth and pair the VitalJacket in your device\'s Settings.</string>
 </resources>
