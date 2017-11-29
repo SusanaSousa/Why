@@ -26,8 +26,9 @@
     <string name="heartRate_tv">Heart Rate:</string>
     <string name="cameras_tv">Cameras</string>
     <string name="notes_bt">ADD NOTES</string>
-    <string name="SuccessDisc">Successfully disconnected from VitalJacket</string>
+    <string name="SuccessDisc">Disconnected from VitalJacket</string>
     <string name="NoDisc">Error disconnecting from VitalJacket</string>
     <string name="AlertTitle">Bluetooth connectivity</string>
     <string name="AlertText">Please enable Bluetooth and pair the VitalJacket in your device\'s Settings.</string>
+    <string name="ConnectingString">Connecting...</string>
 </resources>

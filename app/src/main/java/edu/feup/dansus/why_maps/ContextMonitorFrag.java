@@ -2,18 +2,23 @@ package edu.feup.dansus.why_maps;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -22,6 +27,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -44,6 +50,16 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback {
     private final static int NUM_SAMPLES = 5;
     private boolean isMonitoring = false;
     private FloatingActionButton playBtn;
+    private MenuItem btAppBar;
+    private ArrayList<Integer> mBPM = new ArrayList<>(); // Array list where the correspondent event samples will be added
+    private ArrayList<LatLng> mLoc = new ArrayList<>(); //Array list where the two location points will be saved.
+    private boolean isEventHappening = false;
+    private boolean isPartOfEvent=false;
+    private long startTime;
+    private long endTime;
+    private Location location;
+    private Location startLoc;
+    private Location endLoc;
 
     //Buffer
     // CircularFifoQueue<Integer> queue = new CircularFifoQueue(5); //buffering data
@@ -95,7 +111,6 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback {
             }
         });
 
-
         return view;
     }
 
@@ -106,20 +121,27 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback {
 
                 // Firstly, checking if Bluetooth is enabled and asking user to enable it in case it's not
                 if (!isBluetoothEnabled()) {
-                    AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
-                    alertDialog.setTitle(R.string.AlertTitle);
-                    alertDialog.setMessage(getString(R.string.AlertText));
-                    alertDialog.show();
+                    Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(enableIntent, BioLib.REQUEST_ENABLE_BT);
                 } else {
-                    if (connectionState == false) {
-                        Connect(item);
+                    if (!connectionState) {
+                        Connect();
                     } else {
-                        Disconnect(item);
+                        Disconnect();
                     }
                 }
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(R.menu.why_maps_main, menu);
+        this.btAppBar= menu.getItem(1);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -184,32 +206,6 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback {
         }
     } */
 
-    /* private void getDeviceLocation() {
-     * Get the best and most recent location of the device, which may be null in rare
-     * cases when a location is not available.
-     * Source: https://developers.google.com/maps/documentation/android-api/current-place-tutorial
-
-        FusedLocationProviderClient mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
-
-        try {
-            Task locationResult = mFusedLocationProviderClient.getLastLocation();
-            locationResult.addOnCompleteListener(getActivity(), new OnCompleteListener() {
-                @Override
-                public void onComplete(@NonNull Task task) {
-                    if (task.isSuccessful()) {
-                        // Set the map's camera position to the current location of the device.
-                        mLastKnownLocation = (Location) task.getResult();
-                    } else {
-                        Log.d(TAG, "Current location is null. Using defaults.");
-                        Log.e(TAG, "Exception: %s", task.getException());
-                        mLastKnownLocation = null;
-                    }
-                }
-            });
-        } catch (SecurityException e) {
-            Log.e("Exception: %s", e.getMessage());
-        } */
-
     /**
      * The Handler that gets information back from the BioLib
      */
@@ -221,23 +217,61 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback {
             switch (msg.what)
             {
                 case BioLib.MESSAGE_PUSH_BUTTON:
-                    Date DATETIME_PUSH_BUTTON = (Date)msg.obj;
-                    int numOfPushButton = msg.arg1;
-                    Log.i("PUSH-BUTTON", "numOfPushButton" + numOfPushButton + DATETIME_PUSH_BUTTON);
-
+                    Log.i("PUSH-BUTTON", "Pushbutton was clicked");
                     break;
-
 
                 case BioLib.MESSAGE_PEAK_DETECTION:
                     BioLib.QRS qrs = (BioLib.QRS)msg.obj;
                     Log.i("HR Info", "PEAK: " + qrs.position + "  BPMi: " + qrs.bpmi + " bpm  BPM: " + qrs.bpm + " bpm  R-R: " + qrs.rr + " ms");
 
-                    if (qrs.bpm > 170){
+                    if (qrs.bpm > 200){
                         AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
                         alertDialog.setTitle("Alert");
                         alertDialog.setMessage("Alert message to be shown");
                         alertDialog.show();
                     }
+                    break;
+
+                case BioLib.UNABLE_TO_CONNECT_DEVICE:
+                    Toast.makeText(app, R.string.NoConnection, Toast.LENGTH_LONG).show();
+                    break;
+
+                case BioLib.STATE_CONNECTED:
+                    // Informing the user
+                    Toast.makeText(app, getString(R.string.SuccessfulConnection) + " " + deviceToConnect.getName(), Toast.LENGTH_SHORT).show();
+
+                    // Adjusting system variables
+                    connectionState = true;
+
+                    // Adjusting buttons
+                    btAppBar.setIcon(R.drawable.ic_bluetooth_connected_black_24dp); // Updating the action bar icon
+                    playBtn.setVisibility(View.VISIBLE); // Showing record button
+
+                    // Syncing clocks
+                    Date currentDate = Calendar.getInstance().getTime();
+
+                    try {
+                        lib.SetRTC(currentDate);
+                    } catch (Exception e){
+                        Log.i("Clock syncing", "Failed");
+                    }
+
+                    break;
+
+                case BioLib.MESSAGE_DISCONNECT_TO_DEVICE:
+                    // Informing the user
+                    Toast.makeText(app, R.string.SuccessDisc, Toast.LENGTH_SHORT).show();
+
+                    // Updating system variables
+                    connectionState = false;
+                    btAppBar.setIcon(R.drawable.ic_bluetooth_black_24dp); // Updating the action
+                    playBtn.setVisibility(View.INVISIBLE); // Hiding record button
+                    break;
+
+                case BioLib.STATE_CONNECTING:
+                    Toast.makeText(app, R.string.ConnectingString, Toast.LENGTH_SHORT).show();
+                    break;
+
 
             }
         }
@@ -246,36 +280,26 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback {
     /***
      * Connect to device.
      */
-    private void Connect(MenuItem item) {
+    private void Connect() {
         try {
             deviceToConnect = lib.mBluetoothAdapter.getRemoteDevice(app.VJ_ADDRESS);
             lib.Connect(app.VJ_ADDRESS, NUM_SAMPLES);
-            connectionState = true;
-            item.setIcon(R.drawable.ic_bluetooth_connected_black_24dp); // Updating the action bar icon
-            Snackbar.make(getView(), getString(R.string.SuccessfulConnection)+" "+deviceToConnect.getName(), Snackbar.LENGTH_LONG).show();
-            playBtn.setVisibility(View.VISIBLE); // Showing record button
         } catch (Exception e) {
             e.printStackTrace();
-            Snackbar.make(getView(), R.string.NoConnection, Snackbar.LENGTH_LONG).show();
         }
     }
+
+
     /***
      * Disconnect from device.
      */
-    private void Disconnect(MenuItem item)
-    {
-        try
-        {
+    private void Disconnect() {
+        try {
             lib.Disconnect();
-            connectionState = false;
-            item.setIcon(R.drawable.ic_bluetooth_black_24dp); // Updating the action
-            Snackbar.make(getView(), R.string.SuccessDisc, Snackbar.LENGTH_SHORT).show();
-            playBtn.setVisibility(View.INVISIBLE); // Hiding record button
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             e.printStackTrace();
-            Snackbar.make(getView(), R.string.NoDisc, Snackbar.LENGTH_SHORT).show();
+            Toast.makeText(app, R.string.NoDisc, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -298,7 +322,63 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback {
     {
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         return mBluetoothAdapter.isEnabled();
+    }
+
+    @Override
+    public void onDestroyView(){
+        if (connectionState){ // Destroying connection when fragment is gone
+            Disconnect();
+            super.onDestroyView();
+        }
+
+        super.onDestroyView();
+    }
+
+    private void processBPMInfo(int bpm, boolean isEventHappening, boolean isPartOfEvent) {
+        int threshold=170; // here we will call user threshold
+        //Check is the current sample is part of an Event or not
+        isPartOfEvent = bpm > threshold;
+
+        // Dealing with isEventHappening and isPartOfEvent possible combinations
+
+        if (isEventHappening==false && isPartOfEvent==true){ //the event is not happening and this is the sample that initializes the event
+            mBPM.clear(); //We know that this is the first element, so here we clear the array making sure it is empty
+            mBPM.add(bpm); //Add the sample to the array
+            startTime = SystemClock.elapsedRealtime(); //Initializes the timer in order to calculate event's duration
+            //trigger to take a photo
+            startLoc = location;
+
+            isEventHappening=true;
+        }else if (isEventHappening==true && isPartOfEvent==true){
+            mBPM.add(bpm);
+        }else if (isEventHappening==true && isPartOfEvent==false){ //the event is happening and ends here
+            endTime = SystemClock.elapsedRealtime();
+            //trigger to take photo
+            endLoc = location;
+            isEventHappening=false;
+            processEventInfo(mBPM,mLoc,startTime, endTime, startLoc, endLoc);
+
+        }else{
+            //do nothing
+        }
+
 
     }
 
+    private void processEventInfo(ArrayList<Integer> mBPM, ArrayList<LatLng> mLoc, long startTime, long endTime, Location starrLoc, Location endLoc) {
+
+        // Calculate the average heart rate
+        double avgBPM=calculateAverage(mBPM);
+
+        // Calculate the event's duration
+        long tDelta = endTime - startTime; //miliseconds
+        double duration = tDelta / 1000.0; //seconds
+
+        //Interpolate locations
+
+        //Add information to dataBase
+        Date date = new Date();
     }
+
+}
+
