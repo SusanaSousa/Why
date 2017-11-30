@@ -2,10 +2,7 @@ package edu.feup.dansus.why_maps;
 
 import android.app.Application;
 
-import java.sql.Time;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by dany on 25-11-2017.
@@ -15,8 +12,9 @@ import java.util.List;
 
 public class WhyApp extends Application {
 
-    public static List<Event> events = new ArrayList<>(); // EventsFrag extracted from the DB
+    public static ArrayList<Event> events = new ArrayList<>(); // EventsFrag extracted from the DB
     public static final String VJ_ADDRESS = "00:23:FE:00:0B:54";
+    public static User currentUser;
 
     @Override
     public void onCreate() {
@@ -31,10 +29,13 @@ public class WhyApp extends Application {
         sampleUser.username = "Susana";
         sampleUser.userAge = 22;
         sampleUser.userProfession = "Engenheira";
-        sampleUser.userThreshold = 2.1;
+        sampleUser.userThreshold = 170;
 
+        currentUser = sampleUser;
+
+        /*
         Event sampleEvent = new Event();
-        Time time = new Time(20);
+        Double time = (double) 4;
         Date date = new Date();
         sampleEvent.user=sampleUser;
         sampleEvent.duration = time;
@@ -46,15 +47,9 @@ public class WhyApp extends Application {
 
         db.addEvent(sampleEvent);
 
-        // Create sample data
-        User sampleUser2 = new User();
-        sampleUser2.username = "Joanita";
-        sampleUser2.userAge = 20;
-        sampleUser2.userProfession = "Agricultora";
-        sampleUser2.userThreshold = 2.1;
 
         Event sampleEvent2 = new Event();
-        Time time2 = new Time(20);
+        Double time2 = (double) 2;
         Date date2 = new Date();
         sampleEvent2.user=sampleUser2;
         sampleEvent2.duration = time2;
@@ -67,8 +62,8 @@ public class WhyApp extends Application {
         db.addEvent(sampleEvent2);
 
         // Create sample data
-        Event sampleEvent3 = new Event();
-        Time time3 = new Time(20);
+        /*Event sampleEvent3 = new Event();
+        Double time3 = (double) 20;
         Date date3 = new Date();
         sampleEvent3.user=sampleUser;
         sampleEvent3.duration = time3;
@@ -78,7 +73,7 @@ public class WhyApp extends Application {
         sampleEvent3.longitude = -8.603869;
         sampleEvent3.timeRR = 4;
 
-        db.addEvent(sampleEvent3);
+        db.addEvent(sampleEvent3);*/
 
         events = db.getAllEvents();
         db.close();

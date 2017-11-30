@@ -10,11 +10,11 @@ public class User {
     String username;
     String userProfession;
     int userAge;
-    double userThreshold;
+    int userThreshold;
 
     public User(){}
 
-    public User(long userID, String username, String userProfession, int userAge, double userThreshold){
+    public User(long userID, String username, String userProfession, int userAge, int userThreshold){
         this.userID=userID;
         this.username=username;
         this.userProfession=userProfession;
@@ -48,10 +48,10 @@ public class User {
     public void setUserAge(int age){
         this.userAge=age;
     }
-    public double getUserThreshold(){
+    public int getUserThreshold(){
         return this.userThreshold;
     }
-    public void setUserThreshold(double tresh){
+    public void setUserThreshold(int tresh){
         this.userThreshold=tresh;
     }
 

@@ -12,7 +12,6 @@ import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
@@ -67,6 +66,7 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
     private ArrayList<LatLng> mLocs = new ArrayList<>(); //Array list where the two location points will be saved.
     private boolean isEventHappening = false;
     private boolean isPartOfEvent=false;
+    private boolean isPartOfUserEvent = false;
     private long startTime;
     private long endTime;
 
@@ -149,6 +149,8 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+
         switch (item.getItemId()) {
             case R.id.action_bluetooth: {
 
@@ -156,13 +158,21 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
                 if (!isBluetoothEnabled()) {
                     Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     startActivityForResult(enableIntent, BioLib.REQUEST_ENABLE_BT);
+                    break;
                 } else {
                     if (!connectionState) {
                         Connect();
+                        break;
                     } else {
                         Disconnect();
+                        break;
                     }
                 }
+            }
+
+            case R.id.action_heart: {
+                isPartOfUserEvent = true;
+                break;
             }
         }
         return super.onOptionsItemSelected(item);
@@ -183,32 +193,12 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
 
         map.setInfoWindowAdapter(new EventMapAdapter(getLayoutInflater(),mEvents));
 
-        //Getting location information from all events in DB (assuming that they belong to the same user.
-        final List<LatLng> eventLoc = new ArrayList<LatLng>();
-        double latitude;
-        double longitude;
-
         // Enabling Current location and moving the camera there
         mMap.setMyLocationEnabled(true); // By this time, we will have the required permissions (fragment doesn't launch without it)
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.setBuildingsEnabled(true);
 
-        // Loading events
-        for (int i=0; i<mEvents.size(); i++){
-            latitude=mEvents.get(i).getLatitude();
-            longitude=mEvents.get(i).getLongitude();
-            LatLng newEvent= new LatLng(latitude, longitude);
-            eventLoc.add(newEvent);
-        }
-
-
-        // Add a marker for all events in DB
-        for (int i=0; i < eventLoc.size();i++){
-            map.addMarker(new MarkerOptions()
-                    .position(eventLoc.get(i))
-                    .title("Event "+ i)); // TODO: custom marker
-        }
-
+        loadEventsToMap();
     }
 
     // Getting a BitmapDescriptor from a .xml defined icon
@@ -246,18 +236,19 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
             {
                 case BioLib.MESSAGE_PUSH_BUTTON:
                     Log.i("PUSH-BUTTON", "Pushbutton was clicked");
+                    if (isMonitoring) {
+                        isPartOfUserEvent = true;
+                    }
                     break;
 
                 case BioLib.MESSAGE_PEAK_DETECTION:
                     BioLib.QRS qrs = (BioLib.QRS)msg.obj;
                     Log.i("HR Info", "PEAK: " + qrs.position + "  BPMi: " + qrs.bpmi + " bpm  BPM: " + qrs.bpm + " bpm  R-R: " + qrs.rr + " ms");
 
-                    if (qrs.bpm > 200){
-                        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
-                        alertDialog.setTitle("Alert");
-                        alertDialog.setMessage("Alert message to be shown");
-                        alertDialog.show();
+                    if (isMonitoring){
+                        processBPMInfo(qrs.bpm);
                     }
+
                     break;
 
                 case BioLib.UNABLE_TO_CONNECT_DEVICE:
@@ -297,6 +288,10 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
                     connectionState = false;
                     btAppBar.setIcon(R.drawable.ic_bluetooth_black_24dp); // Updating the action
                     playBtn.setVisibility(View.INVISIBLE); // Hiding record button
+                    isPartOfEvent = false;
+                    isPartOfUserEvent = false;
+                    isPartOfEvent = false;
+                    isMonitoring = false;
                     break;
 
                 case BioLib.STATE_CONNECTING:
@@ -327,6 +322,12 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
     private void Disconnect() {
         try {
             lib.Disconnect();
+
+            // Resetting state variables
+            isPartOfEvent = false;
+            isPartOfUserEvent = false;
+            isPartOfEvent = false;
+            isMonitoring = false;
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -365,14 +366,17 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
         super.onDestroyView();
     }
 
-    private void processBPMInfo(int bpm, boolean isEventHappening, boolean isPartOfEvent) {
-        int threshold=170; // here we will call user threshold
+    private void processBPMInfo(int bpm) {
+        int threshold=app.currentUser.getUserThreshold(); // here we will call user threshold
+
         //Check is the current sample is part of an Event or not
-        isPartOfEvent = bpm > threshold;
+        if (bpm < 1.10*threshold || bpm > 0.9*threshold){
+            isPartOfEvent = true;
+        };
 
         // Dealing with isEventHappening and isPartOfEvent possible combinations
 
-        if (isEventHappening==false && isPartOfEvent==true){ //the event is not happening and this is the sample that initializes the event
+        if (isEventHappening==false && (isPartOfEvent==true || isPartOfUserEvent==true)){ //the event is not happening and this is the sample that initializes the event
             mBPM.clear(); //We know that this is the first element, so here we clear the array making sure it is empty
             mBPM.add(bpm); //Add the sample to the array
             startTime = SystemClock.elapsedRealtime(); //Initializes the timer in order to calculate event's duration
@@ -380,6 +384,10 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
             startLoc = mLocation;
 
             isEventHappening=true;
+
+            // User feedback
+            Toast.makeText(app, R.string.RecordString, Toast.LENGTH_SHORT).show();
+
         }else if (isEventHappening==true && isPartOfEvent==true){
             mBPM.add(bpm);
         }else if (isEventHappening==true && isPartOfEvent==false){ //the event is happening and ends here
@@ -387,30 +395,11 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
             //trigger to take photo
             endLoc = mLocation;
             isEventHappening=false;
+            isPartOfUserEvent=false;
             processEventInfo(mBPM, mLocs,startTime, endTime, startLoc, endLoc);
-
-        }else{
-            //do nothing
+            Toast.makeText(app, R.string.StopEventString, Toast.LENGTH_SHORT).show();
         }
-
-
     }
-
-    private void processEventInfo(ArrayList<Integer> mBPM, ArrayList<LatLng> mLoc, long startTime, long endTime, Location starrLoc, Location endLoc) {
-
-        // Calculate the average heart rate
-        double avgBPM=calculateAverage(mBPM);
-
-        // Calculate the event's duration
-        long tDelta = endTime - startTime; //miliseconds
-        double duration = tDelta / 1000.0; //seconds
-
-        //Interpolate locations
-
-        //Add information to dataBase
-        Date date = new Date();
-    }
-
 
     // Google Location Services overrides
 
@@ -498,6 +487,53 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
         LatLng avgLoc = new LatLng((startLat+endLat)/2, (startLng+endLng)/2);
 
         return avgLoc;
+    }
+
+    private void processEventInfo(ArrayList<Integer> mBPM, ArrayList<LatLng> mLoc, long startTime, long endTime, Location starrLoc, Location endLoc) {
+
+        // Calculate the average heart rate
+        double avgBPM=calculateAverage(mBPM);
+
+        // Calculate the event's duration
+        long tDelta = endTime - startTime; //miliseconds
+        double duration = tDelta / 1000.0; //seconds
+
+        //Interpolate locations
+        LatLng avgLocation = getAvgLocation(startLoc, endLoc);
+
+        //Add information to dataBase
+        Date date = new Date();
+
+        // Creating the event object and adding it to the DB
+        Event currentEvent = new Event(app.currentUser, date, null, avgLocation.latitude, avgLocation.longitude, avgBPM, (double)0, duration);
+        dbHandler.addEvent(currentEvent);
+        loadEventsToMap();
+    }
+
+    private void loadEventsToMap(){
+        //Getting location information from all events in DB (assuming that they belong to the same user)
+        ArrayList<LatLng> eventLoc = new ArrayList<LatLng>();
+        double latitude, longitude;
+
+        // Updating event list
+        mEvents = dbHandler.getAllEvents();
+        dbHandler.close();
+
+        // Loading events
+        for (int i=0; i<mEvents.size(); i++){
+            latitude=mEvents.get(i).getLatitude();
+            longitude=mEvents.get(i).getLongitude();
+            LatLng newEvent= new LatLng(latitude, longitude);
+            eventLoc.add(newEvent);
+        }
+
+
+        // Add a marker for all events in DB
+        for (int i=0; i < eventLoc.size();i++){
+            mMap.addMarker(new MarkerOptions()
+                    .position(eventLoc.get(i))
+                    .title("Event "+ i)); // TODO: custom marker
+        }
     }
 }
 

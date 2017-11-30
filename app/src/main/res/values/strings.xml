@@ -31,4 +31,6 @@
     <string name="AlertTitle">Bluetooth connectivity</string>
     <string name="AlertText">Please enable Bluetooth and pair the VitalJacket in your device\'s Settings.</string>
     <string name="ConnectingString">Connecting...</string>
+    <string name="RecordString">Recording event...</string>
+    <string name="StopEventString">Event stopped</string>
 </resources>
