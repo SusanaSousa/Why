@@ -32,6 +32,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_USER_ID = "userID";
     private static final String KEY_USER_NAME = "username";
     private static final String KEY_USER_PROF = "profession";
+    private static final String KEY_USER_EMAIL = "email";
     private static final String KEY_USER_AGE = "age";
     private static final String KEY_USER_THRESH = "userthresh";
 
@@ -39,12 +40,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_EVENT_USER_ID_FK = "userId";
     private static final String KEY_EVENT_ID = "eventID";
     private static final String KEY_EVENT_DATE = "date_time";
-    //private static final String KEY_EVENT_IMAGE = "photo";
+    private static final String KEY_EVENT_PHOTO_START_FRONT="photo_start_front";
+    private static final String KEY_EVENT_PHOTO_START_REAR="photo_start_rear";
+    private static final String KEY_EVENT_PHOTO_END_FRONT="photo_end_front";
+    private static final String KEY_EVENT_PHOTO_END_REAR="photo_end_rear";
     private static final String KEY_EVENT_GPS_LAT = "gps_lat";
     private static final String KEY_EVENT_GPS_LONG = "gps_long";
     private static final String KEY_EVENT_RR = "RR_time";
     private static final String KEY_EVENT_TEMP = "body_temperature";
     private static final String KEY_EVENT_DUR = "event_duration";
+    private static final String KEY_EVENT_NOTES= "notes";
 
 
     public DatabaseHandler(Context context) {
@@ -60,6 +65,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 KEY_USER_ID + " INTEGER PRIMARY KEY," +
                 KEY_USER_NAME + " TEXT," +
                 KEY_USER_PROF + " TEXT," +
+                KEY_USER_EMAIL + " TEXT," +
                 KEY_USER_AGE + " INTEGER," +
                 KEY_USER_THRESH + " REAL" +
                 ")";
@@ -70,13 +76,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 KEY_EVENT_ID + " INTEGER PRIMARY KEY," +
                 KEY_EVENT_USER_ID_FK + " INTEGER REFERENCES " + TABLE_USERS + "," + // Define a foreign key
                 KEY_EVENT_DATE + " TEXT," +
-                //KEY_EVENT_IMAGE + "TEXT," +
+                KEY_EVENT_PHOTO_START_FRONT + " TEXT," +
+                KEY_EVENT_PHOTO_START_REAR + " TEXT," +
+                KEY_EVENT_PHOTO_END_FRONT + " TEXT," +
+                KEY_EVENT_PHOTO_END_REAR + " TEXT," +
                 KEY_EVENT_GPS_LAT + " REAL," +
                 KEY_EVENT_GPS_LONG + " REAL," +
                 KEY_EVENT_RR + " REAL," +
                 KEY_EVENT_TEMP + " REAL," +
-                KEY_EVENT_DUR + " REAL" +
+                KEY_EVENT_DUR + " REAL," +
+                KEY_EVENT_NOTES + " TEXT" +
                 ")";
+
         sqLiteDatabase.execSQL(CREATE_EVENTS_TABLE);
         sqLiteDatabase.execSQL(CREATE_USERS_TABLE);
     }
@@ -101,19 +112,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             long userId = addOrUpdateUser(event.user);
             ContentValues values = new ContentValues();
             values.put(KEY_EVENT_USER_ID_FK, userId);
-            //values.put(KEY_EVENT_IMAGE, event.photo);
-            values.put(KEY_EVENT_DATE, formatDateToString(event.date));
-            values.put(KEY_EVENT_GPS_LAT , event.latitude);
-            values.put(KEY_EVENT_GPS_LONG, event.longitude);
-            values.put(KEY_EVENT_RR, event.timeRR);
-            values.put(KEY_EVENT_TEMP, event.bodyTemp);
-            values.put(KEY_EVENT_DUR, event.duration);
+            values.put(KEY_EVENT_PHOTO_START_FRONT, event.getPhotoStartFront());
+            values.put(KEY_EVENT_PHOTO_START_REAR, event.getPhotoStartRear());
+            values.put(KEY_EVENT_PHOTO_END_FRONT, event.getPhotoEndFront());
+            values.put(KEY_EVENT_PHOTO_END_REAR, event.getPhotoEndRear());
+            values.put(KEY_EVENT_DATE, formatDateToString(event.getDate()));
+            values.put(KEY_EVENT_GPS_LAT , event.getLatitude());
+            values.put(KEY_EVENT_GPS_LONG, event.getLongitude());
+            values.put(KEY_EVENT_RR, event.getHearRate());
+            values.put(KEY_EVENT_DUR, event.getDuration());
+            values.put(KEY_EVENT_NOTES, event.getNotes());
 
             // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
             sqLiteDatabase.insertOrThrow(TABLE_EVENTS, null, values);
             sqLiteDatabase.setTransactionSuccessful();
         } catch (Exception e) {
-            Log.d(TAG, "Error while trying to add post to database");
+            Log.d(TAG, "Error while trying to add event to database");
         } finally {
             sqLiteDatabase.endTransaction();
         }
@@ -129,6 +143,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put(KEY_USER_NAME, user.getUsername());
             values.put(KEY_USER_PROF, user.getUserProfession());
+            values.put(KEY_USER_EMAIL, user.getUserEmail());
             values.put(KEY_USER_AGE, user.getUserAge());
             values.put(KEY_USER_THRESH, user.getUserThreshold());
 
@@ -192,16 +207,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     newUser.userProfession = cursor.getString(cursor.getColumnIndex(KEY_USER_PROF));
                     newUser.userAge = Integer.parseInt(cursor.getString(cursor.getColumnIndex(KEY_USER_AGE)));
                     newUser.userThreshold = Integer.parseInt(cursor.getString(cursor.getColumnIndex(KEY_USER_THRESH)));
-                    newUser.userID=Integer.parseInt(cursor.getString(cursor.getColumnIndex(KEY_USER_ID)));
 
                     Event newEvent = new Event();
                     newEvent.eventID=Integer.parseInt(cursor.getString(cursor.getColumnIndex(KEY_EVENT_ID)));
                     newEvent.duration= Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_EVENT_DUR)));
-                    newEvent.bodyTemp=Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_EVENT_TEMP)));
                     newEvent.date=formatStringtToDate(cursor.getString(cursor.getColumnIndex(KEY_EVENT_DATE)));
+                    newEvent.photo_start_front=cursor.getString(cursor.getColumnIndex(KEY_EVENT_PHOTO_START_FRONT));
+                    newEvent.photo_start_rear=cursor.getString(cursor.getColumnIndex(KEY_EVENT_PHOTO_START_REAR));
+                    newEvent.photo_end_front=cursor.getString(cursor.getColumnIndex(KEY_EVENT_PHOTO_END_FRONT));
+                    newEvent.photo_end_rear=cursor.getString(cursor.getColumnIndex(KEY_EVENT_PHOTO_END_REAR));
                     newEvent.latitude=Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_EVENT_GPS_LAT)));
                     newEvent.longitude=Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_EVENT_GPS_LONG)));
-                    newEvent.timeRR = Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_EVENT_RR)));
+                    newEvent.hearRate = Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_EVENT_RR)));
+                    newEvent.notes=cursor.getString(cursor.getColumnIndex(KEY_EVENT_NOTES));
                     newEvent.user=newUser;
                     events.add(newEvent);
 
