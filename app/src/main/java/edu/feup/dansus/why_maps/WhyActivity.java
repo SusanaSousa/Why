@@ -1,7 +1,10 @@
 package edu.feup.dansus.why_maps;
 
 import android.Manifest;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -15,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class WhyActivity extends AppCompatActivity {
 
@@ -82,6 +86,7 @@ public class WhyActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 launchDrawerFragments(item);
+                item.setChecked(false);
                 return true;
             }
         });
@@ -126,7 +131,15 @@ public class WhyActivity extends AppCompatActivity {
                 break;
 
             case R.id.help_nav:
-                fragmentClass = HelpFrag.class;
+                // Launching the intent
+                Intent cmebWebIntent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse("https://sigarra.up.pt/feup/pt/ucurr_geral.ficha_uc_view?pv_ocorrencia_id=406933"));
+
+                try {
+                    startActivity(cmebWebIntent);
+                } catch (ActivityNotFoundException e) { // Prepare for the worst, a web browser may not be installed!
+                    Toast.makeText(this, "Please install a web browser to access help", Toast.LENGTH_LONG).show();
+                }
+
                 break;
 
             case R.id.about_nav:
@@ -181,17 +194,14 @@ public class WhyActivity extends AppCompatActivity {
     }
 
     private void launchFrag(Class fragClass){
-            // By this time, we are sure we have location permissions, so let's go ahead and load it
-
             Fragment frag = null;
 
             try {
                 frag = (Fragment) fragClass.newInstance();
+                fragMan.beginTransaction().replace(R.id.frag_accepter, frag).commit();
             } catch (Exception e){
                 e.printStackTrace();
             }
-
-            fragMan.beginTransaction().replace(R.id.frag_accepter, frag).commit();
         }
 
 

@@ -3,26 +3,38 @@ package edu.feup.dansus.why_maps;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -38,7 +50,7 @@ import Bio.Library.namespace.BioLib;
  * Context monitor screen
  */
 
-public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback {
+public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private SupportMapFragment mapFragment; // Map will be a fragment
     private GoogleMap mMap;
     private List<Event> mEvents = new ArrayList<>(); // Array pointing to the global events array
@@ -52,12 +64,18 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback {
     private FloatingActionButton playBtn;
     private MenuItem btAppBar;
     private ArrayList<Integer> mBPM = new ArrayList<>(); // Array list where the correspondent event samples will be added
-    private ArrayList<LatLng> mLoc = new ArrayList<>(); //Array list where the two location points will be saved.
+    private ArrayList<LatLng> mLocs = new ArrayList<>(); //Array list where the two location points will be saved.
     private boolean isEventHappening = false;
     private boolean isPartOfEvent=false;
     private long startTime;
     private long endTime;
-    private Location location;
+
+    // Location
+    private GoogleApiClient mGoogleApiClient;
+    public static final String TAG = "ContextMonitor";
+    private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000; // code to handle connection errors to Google Play Services
+    private LocationRequest mLocationRequest;
+    private Location mLocation; // current location
     private Location startLoc;
     private Location endLoc;
 
@@ -111,8 +129,23 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback {
             }
         });
 
+        // Creating the Location interface
+        mGoogleApiClient = new GoogleApiClient.Builder(this.getContext())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+
+        // Create the LocationRequest object
+        mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY) // Prefer GPS
+                .setInterval(10 * 1000)        // 10 seconds, in milliseconds (minimum interval between location updates)
+                .setFastestInterval(1 * 1000); // 1 second, in milliseconds (best case scenario)
+
         return view;
     }
+
+    // Map callbacks
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -176,11 +209,6 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback {
                     .title("Event "+ i)); // TODO: custom marker
         }
 
-        //
-
-        // Updating and zooming in on the current location
-        // getDeviceLocation();
-
     }
 
     // Getting a BitmapDescriptor from a .xml defined icon
@@ -237,8 +265,11 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback {
                     break;
 
                 case BioLib.STATE_CONNECTED:
-                    // Informing the user
-                    Toast.makeText(app, getString(R.string.SuccessfulConnection) + " " + deviceToConnect.getName(), Toast.LENGTH_SHORT).show();
+                    // Informing the user of the successful operation
+                    Toast successT = Toast.makeText(app, Html.fromHtml(getString(R.string.SuccessfulConnection) + " " + "<strong>" + deviceToConnect.getName() + "</strong>"), Toast.LENGTH_SHORT);
+                    TextView v = (TextView) successT.getView().findViewById(android.R.id.message);
+                    if (v != null) v.setGravity(Gravity.CENTER);
+                    successT.show();
 
                     // Adjusting system variables
                     connectionState = true;
@@ -346,7 +377,7 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback {
             mBPM.add(bpm); //Add the sample to the array
             startTime = SystemClock.elapsedRealtime(); //Initializes the timer in order to calculate event's duration
             //trigger to take a photo
-            startLoc = location;
+            startLoc = mLocation;
 
             isEventHappening=true;
         }else if (isEventHappening==true && isPartOfEvent==true){
@@ -354,9 +385,9 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback {
         }else if (isEventHappening==true && isPartOfEvent==false){ //the event is happening and ends here
             endTime = SystemClock.elapsedRealtime();
             //trigger to take photo
-            endLoc = location;
+            endLoc = mLocation;
             isEventHappening=false;
-            processEventInfo(mBPM,mLoc,startTime, endTime, startLoc, endLoc);
+            processEventInfo(mBPM, mLocs,startTime, endTime, startLoc, endLoc);
 
         }else{
             //do nothing
@@ -380,5 +411,93 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback {
         Date date = new Date();
     }
 
+
+    // Google Location Services overrides
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) { // When location services are connected
+        mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        if (mLocation == null){ // location may be null, initially
+            // we start requesting location updates, to be delivered to the listener
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        } else {
+            updateMapLocation();
+        }
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) { // Location services connection successful
+        Log.i(TAG, "Location services suspended. Please reconnect.");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        // Source: https://github.com/treehouse/android-location-example/blob/master/app/src/main/java/teamtreehouse/com/iamhere/MapsActivity.java
+        if (connectionResult.hasResolution()) {
+            try {
+                // Start an Activity that tries to resolve the error
+                connectionResult.startResolutionForResult(this.getActivity(), CONNECTION_FAILURE_RESOLUTION_REQUEST);
+            } catch (IntentSender.SendIntentException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.i(TAG, "Location services connection failed with code " + connectionResult.getErrorCode());
+        }
+    }
+
+
+    @Override
+    public void onLocationChanged(Location location) { // Whenever a new location is detected by Google Play Services
+        mLocation = location;
+        updateMapLocation();
+    }
+
+    // Fragment overrides
+
+    @Override
+    public void onResume(){ // onResume() is called when fragment is started or when its state is restored
+        super.onResume();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onPause(){ // companion to onPause
+        super.onPause();
+        if (mGoogleApiClient.isConnected()){ // it only makes sense to disconnect if we are connected
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    private void updateMapLocation(){
+        double currentLat = mLocation.getLatitude();
+        double currentLng = mLocation.getLongitude();
+
+        LatLng currentLatLng = new LatLng(currentLat, currentLng);
+
+        // Creating the new camera position
+        CameraPosition cameraPos = new CameraPosition.Builder() // Builder pattern (to set multiple settings at once)
+                .target(currentLatLng)
+                .zoom(10) // city-level zoom
+                .tilt(45)
+                .build();
+
+        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
+
+    }
+
+    private LatLng getAvgLocation (Location startlLoc, Location endLoc){ // Getting the average coordinates between a set of two Locations
+        double startLat = startLoc.getLatitude();
+        double startLng = startLoc.getLongitude();
+        double endLat = endLoc.getLatitude();
+        double endLng = endLoc.getLongitude();
+
+        // Averaging (assuming everything is correctly given as a double)
+        LatLng avgLoc = new LatLng((startLat+endLat)/2, (startLng+endLng)/2);
+
+        return avgLoc;
+    }
 }
 
