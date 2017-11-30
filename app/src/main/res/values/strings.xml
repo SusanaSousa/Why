@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">WHY-Maps</string>
+    <string name="app_name">Why</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -9,10 +9,28 @@
     <string name="google_maps_api_key">AIzaSyDOxq8kceDn-c6SJleULeAorHao2wAi2pA</string>
     <string name="simulate_event">Manually Trigger Event</string>
     <string name="bluetooth_devices">Bluetooth connection</string>
+
+    <string name="ContextDrawer">Context monitor</string>
+    <string name="EventsDrawer">Events</string>
+    <string name="DevicesDrawer">Devices</string>
+    <string name="SummaryDrawer">Summary Report</string>
+    <string name="SettingsDrawer">Settings</string>
+    <string name="HelpDrawer">Help</string>
+    <string name="AboutDrawer">About</string>
+    <string name="EmptyMessage">Screen yet to be implemented.</string>
+    <string name="SuccessfulConnection">Successfully connected to VitalJacket</string>
+    <string name="NoConnection">Error connecting to VitalJacket</string>
     <string name="eventOn_tv">Event on</string>
-    <string name="eventDate_tv">oi</string>
+    <string name="eventDate_tv">Date</string>
     <string name="duration_tv">Duration:</string>
     <string name="heartRate_tv">Heart Rate:</string>
     <string name="cameras_tv">Cameras</string>
     <string name="notes_bt">ADD NOTES</string>
+    <string name="SuccessDisc">Disconnected from VitalJacket</string>
+    <string name="NoDisc">Error disconnecting from VitalJacket</string>
+    <string name="AlertTitle">Bluetooth connectivity</string>
+    <string name="AlertText">Please enable Bluetooth and pair the VitalJacket in your device\'s Settings.</string>
+    <string name="ConnectingString">Connecting...</string>
+    <string name="RecordString">Recording event...</string>
+    <string name="StopEventString">Event stopped</string>
 </resources>

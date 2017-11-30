@@ -8,6 +8,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -16,21 +17,19 @@ import java.util.Locale;
  * Created by Susana on 26/11/2017.
  */
 
-public class WindowAdapter implements GoogleMap.InfoWindowAdapter {
+public class EventMapAdapter implements GoogleMap.InfoWindowAdapter {
     LayoutInflater mInflater;
-    List<Event> mEvents;
+    ArrayList<Event> mEvents = new ArrayList<>();
 
 
-    public WindowAdapter (LayoutInflater layout, List<Event> events){
+    public EventMapAdapter (LayoutInflater layout, List<Event> events){
         mInflater=layout;
-        mEvents=events;
-
+        mEvents=WhyApp.events;
     }
 
 
     @Override
     public View getInfoWindow(Marker marker) {
-
         return null;
     }
     // In order to define the contents of the InfoWindow based on the marker
@@ -61,7 +60,6 @@ public class WindowAdapter implements GoogleMap.InfoWindowAdapter {
         //Heart Rate
         TextView heartRate=(TextView) view.findViewById(R.id.setHearRate_tv);
         heartRate.setText(Double.toString(event.getTimeRR())); //Setting heartRate from double to string
-
 
         return view;
     }

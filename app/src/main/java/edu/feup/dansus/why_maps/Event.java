@@ -2,7 +2,6 @@ package edu.feup.dansus.why_maps;
 
 import android.media.Image;
 
-import java.sql.Time;
 import java.util.Date;
 
 /**
@@ -20,16 +19,15 @@ public class Event {
     double longitude;
     double timeRR;
     double bodyTemp;
-    Time duration;
+    double duration;
 
     //Constructor
 
     public Event(){
 
     }
-    public Event(User user, int eventID, Date date, Image photo, double latitude, double longitude, double timeRR, double bodyTemp, Time duration){
+    public Event(User user, Date date, Image photo, double latitude, double longitude, double timeRR, double bodyTemp, double duration){
         this.user=user;
-        this.eventID=eventID;
         this.date=date;
         this.photo=photo;
         this.latitude=latitude;
@@ -82,10 +80,10 @@ public class Event {
     public void setBodyTemp(double temp){
         this.bodyTemp=temp;
     }
-    public Time getDuration(){
+    public double getDuration(){
         return this.duration;
     }
-    public void setDuration(Time duration){
+    public void setDuration(double duration){
         this.duration=duration;
     }
 

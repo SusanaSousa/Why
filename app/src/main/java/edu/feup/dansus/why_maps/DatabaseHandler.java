@@ -7,12 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import java.sql.Date;
-import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import static android.content.ContentValues.TAG;
@@ -78,7 +75,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 KEY_EVENT_GPS_LONG + " REAL," +
                 KEY_EVENT_RR + " REAL," +
                 KEY_EVENT_TEMP + " REAL," +
-                KEY_EVENT_DUR + " TEXT" +
+                KEY_EVENT_DUR + " REAL" +
                 ")";
         sqLiteDatabase.execSQL(CREATE_EVENTS_TABLE);
         sqLiteDatabase.execSQL(CREATE_USERS_TABLE);
@@ -110,7 +107,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(KEY_EVENT_GPS_LONG, event.longitude);
             values.put(KEY_EVENT_RR, event.timeRR);
             values.put(KEY_EVENT_TEMP, event.bodyTemp);
-            values.put(KEY_EVENT_DUR, event.duration.toString());
+            values.put(KEY_EVENT_DUR, event.duration);
 
             // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
             sqLiteDatabase.insertOrThrow(TABLE_EVENTS, null, values);
@@ -169,8 +166,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return userId;
     }
     // Getting All Contacts
-    public List<Event> getAllEvents() {
-        List<Event> events = new ArrayList<>();
+    public ArrayList<Event> getAllEvents() {
+        ArrayList<Event> events = new ArrayList<>();
 
         // SELECT * FROM EVENTS
         // LEFT OUTER JOIN USERS
@@ -185,7 +182,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         //String selectQuery = "SELECT  * FROM " + TABLE_USERS;
         // "getReadableDatabase()" and "getWriteableDatabase()" return the same object (except under low
         // disk space scenarios)
-         SQLiteDatabase db = getReadableDatabase();
+        SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery(EVENTS_SELECT_QUERY, null);
         try {
             if (cursor.moveToFirst()) {
@@ -194,12 +191,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     newUser.username = cursor.getString(cursor.getColumnIndex(KEY_USER_NAME));
                     newUser.userProfession = cursor.getString(cursor.getColumnIndex(KEY_USER_PROF));
                     newUser.userAge = Integer.parseInt(cursor.getString(cursor.getColumnIndex(KEY_USER_AGE)));
-                    newUser.userThreshold = Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_USER_THRESH)));
+                    newUser.userThreshold = Integer.parseInt(cursor.getString(cursor.getColumnIndex(KEY_USER_THRESH)));
                     newUser.userID=Integer.parseInt(cursor.getString(cursor.getColumnIndex(KEY_USER_ID)));
 
                     Event newEvent = new Event();
                     newEvent.eventID=Integer.parseInt(cursor.getString(cursor.getColumnIndex(KEY_EVENT_ID)));
-                    newEvent.duration= Time.valueOf(cursor.getString(cursor.getColumnIndex(KEY_EVENT_DUR)));
+                    newEvent.duration= Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_EVENT_DUR)));
                     newEvent.bodyTemp=Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_EVENT_TEMP)));
                     newEvent.date=formatStringtToDate(cursor.getString(cursor.getColumnIndex(KEY_EVENT_DATE)));
                     newEvent.latitude=Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_EVENT_GPS_LAT)));
@@ -211,7 +208,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 } while(cursor.moveToNext());
             }
         } catch (Exception e) {
-            Log.d(TAG, "Error while trying to get posts from database");
+            Log.d(TAG, "Error while trying to get events from database");
         } finally {
             if (cursor != null && !cursor.isClosed()) {
                 cursor.close();
