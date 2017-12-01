@@ -237,14 +237,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     private String formatDateToString (java.util.Date date){
         SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "EEE, d 'of' MMM, HH:mm", Locale.US);
+                "EEE, d 'of' MMM yyyy, HH:mm", Locale.US);
         return dateFormat.format(date);
 
     }
 
     private java.util.Date formatStringtToDate (String sdate) throws ParseException {
         SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "EEE, d 'of' MMM, HH:mm", Locale.US);
+                "EEE, d 'of' MMM yyyy, HH:mm", Locale.US);
         return dateFormat.parse(sdate);
     }
 }

@@ -33,4 +33,9 @@
     <string name="ConnectingString">Connecting...</string>
     <string name="RecordString">Recording event...</string>
     <string name="StopEventString">Event stopped</string>
+    <string name="weekday_tv">Weekday</string>
+    <string name="date_tv">Date</string>
+    <string name="address_tv">Address</string>
+    <string name="moreContext_bt">MORE CONTEXT</string>
+    <string name="addNotes_bt">ADD NOTES</string>
 </resources>

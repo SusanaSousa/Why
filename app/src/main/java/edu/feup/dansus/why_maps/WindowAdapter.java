@@ -60,8 +60,7 @@ public class WindowAdapter implements GoogleMap.InfoWindowAdapter {
 
         //Heart Rate
         TextView heartRate=(TextView) view.findViewById(R.id.setHearRate_tv);
-        heartRate.setText(Double.toString(event.getTimeRR())); //Setting heartRate from double to string
-
+        heartRate.setText(Double.toString(event.getHearRate())); //Setting heartRate from double to string
 
         return view;
     }

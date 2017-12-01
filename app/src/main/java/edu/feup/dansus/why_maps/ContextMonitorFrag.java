@@ -52,7 +52,7 @@ import Bio.Library.namespace.BioLib;
 public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private SupportMapFragment mapFragment; // Map will be a fragment
     private GoogleMap mMap;
-    private List<Event> mEvents = new ArrayList<>(); // Array pointing to the global events array
+    private ArrayList<Event> mEvents = new ArrayList<>(); // Array pointing to the global events array
     private DatabaseHandler dbHandler;
     private BluetoothDevice deviceToConnect;
     private boolean connectionState=false;
@@ -191,7 +191,7 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
     public void onMapReady(GoogleMap map){ // Map is ready!
         mMap = map;
 
-        map.setInfoWindowAdapter(new EventMapAdapter(getLayoutInflater(),mEvents));
+        map.setInfoWindowAdapter(new EventMapAdapter(getLayoutInflater()));
 
         // Enabling Current location and moving the camera there
         mMap.setMyLocationEnabled(true); // By this time, we will have the required permissions (fragment doesn't launch without it)
@@ -370,9 +370,11 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
         int threshold=app.currentUser.getUserThreshold(); // here we will call user threshold
 
         //Check is the current sample is part of an Event or not
-        if (bpm < 1.10*threshold || bpm > 0.9*threshold){
+        if (bpm  > 0.9*threshold){
             isPartOfEvent = true;
-        };
+        }else {
+            isPartOfEvent = false;
+        }
 
         // Dealing with isEventHappening and isPartOfEvent possible combinations
 
@@ -505,8 +507,13 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
         Date date = new Date();
 
         // Creating the event object and adding it to the DB
-        Event currentEvent = new Event(app.currentUser, date, null, avgLocation.latitude, avgLocation.longitude, avgBPM, (double)0, duration);
+        Event currentEvent = new Event (app.currentUser,date, null, null, null, null, null,avgLocation.latitude, avgLocation.longitude,avgBPM,duration);
         dbHandler.addEvent(currentEvent);
+        app.events = dbHandler.getAllEvents();
+        dbHandler.close();
+
+
+
         loadEventsToMap();
     }
 
