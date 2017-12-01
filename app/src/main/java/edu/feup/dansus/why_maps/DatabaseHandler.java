@@ -234,6 +234,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         return events;
     }
+    public int updateEventNotes(Event event) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_EVENT_NOTES, event.getNotes());
+
+        // Updating profile picture url for user with that userName
+        return db.update(TABLE_EVENTS, values, KEY_EVENT_ID + " = ?",
+                new String[] { String.valueOf(event.eventID) });
+    }
 
     private String formatDateToString (java.util.Date date){
         SimpleDateFormat dateFormat = new SimpleDateFormat(

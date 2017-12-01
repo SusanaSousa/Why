@@ -3,6 +3,8 @@ package edu.feup.dansus.why_maps;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
+import android.support.v4.app.FragmentManager;
+
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,54 +25,36 @@ import java.util.Locale;
  * Created by Susana on 30/11/2017.
  */
 
-public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder> {
+public class EventsAdapter extends RecyclerView.Adapter<EventsHolder> {
     private Context mContext;
     ArrayList<Event> mEvents = new ArrayList<>();
-
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView weekday;
-        public TextView date;
-        public TextView address;
-        public TextView moreContextBt;
-        public TextView addNotesBt;
-        public ImageView photo;
-
-        public ViewHolder(View itemView) {
-
-            super(itemView);
-            weekday = itemView.findViewById(R.id.weekday_tv);
-            date = itemView.findViewById(R.id.date_tv);
-            address = itemView.findViewById(R.id.address_tv);
-            moreContextBt = itemView.findViewById(R.id.moreContext_bt);
-            addNotesBt = itemView.findViewById(R.id.addNotes_bt);
-            photo=itemView.findViewById(R.id.photo_imgv);
-
-        }
-    }
+    public FragmentManager frag;
+    public int adapterPos;
 
 
-    public EventsAdapter(Context context) {
+
+    public EventsAdapter(Context context, FragmentManager frag) {
         this.mContext = context;
+        this.frag = frag;
         this.mEvents = WhyApp.events;
 
+
     }
 
-
-
     @Override
-    public EventsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public EventsHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         //Inflate the costum layout
         View row = inflater.inflate(R.layout.event_item, parent, false);
-        ViewHolder viewHolder = new ViewHolder(row);
+        EventsHolder viewHolder = new EventsHolder(row,frag);
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(EventsAdapter.ViewHolder holder, int position) {
-
+    public void onBindViewHolder(EventsHolder holder, int position) {
+        adapterPos=holder.adapterPos;
         //Setting weekday
         SimpleDateFormat weekday = new SimpleDateFormat("EEEE", Locale.US); //TODO check if is just a E
         TextView weekday_tv = holder.weekday;

@@ -38,4 +38,7 @@
     <string name="address_tv">Address</string>
     <string name="moreContext_bt">MORE CONTEXT</string>
     <string name="addNotes_bt">ADD NOTES</string>
+    <string name="eventNotes_tv">Event Notes</string>
+    <string name="cancel_bt">Cancel</string>
+    <string name="add_bt">Add</string>
 </resources>
