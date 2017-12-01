@@ -170,13 +170,15 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
                 }
             }
 
-            case R.id.action_heart: {
+            case R.id.action_heart: { // when the user taps this button it should only record an instantaneous event
+
                 isPartOfUserEvent = true;
                 break;
             }
         }
         return super.onOptionsItemSelected(item);
     }
+
 
 
     @Override
@@ -245,6 +247,9 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
                     BioLib.QRS qrs = (BioLib.QRS)msg.obj;
                     Log.i("HR Info", "PEAK: " + qrs.position + "  BPMi: " + qrs.bpmi + " bpm  BPM: " + qrs.bpm + " bpm  R-R: " + qrs.rr + " ms");
 
+                    if (isMonitoring && isPartOfUserEvent==true){
+                        processInsUserEvent(qrs.bpm);
+                    }
                     if (isMonitoring){
                         processBPMInfo(qrs.bpm);
                     }
@@ -301,8 +306,31 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
 
             }
         }
-    };
 
+
+    };
+    private void processInsUserEvent(int bpm) {
+
+        //The event's duration is defined as 1s
+        double duration = 1; //seconds
+
+        //location - in this case there is no need to interpolate locations. Only the startlocation is considered
+        startLoc = mLocation;
+
+        //Add information to dataBase
+        Date date = new Date();
+
+        // Creating the event object and adding it to the DB
+        Event currentEvent = new Event (app.currentUser,date, null, null, null, null, null,startLoc.getLatitude(), startLoc.getLongitude(),bpm,duration);
+        dbHandler.addEvent(currentEvent);
+        app.events = dbHandler.getAllEvents();
+        dbHandler.close();
+
+        //after processign this user triggered event, the status returns to false;
+        isPartOfUserEvent=false;
+
+        loadEventsToMap();
+    }
     /***
      * Connect to device.
      */
@@ -378,7 +406,7 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
 
         // Dealing with isEventHappening and isPartOfEvent possible combinations
 
-        if (isEventHappening==false && (isPartOfEvent==true || isPartOfUserEvent==true)){ //the event is not happening and this is the sample that initializes the event
+        if (isEventHappening==false && isPartOfEvent==true){ //the event is not happening and this is the sample that initializes the event
             mBPM.clear(); //We know that this is the first element, so here we clear the array making sure it is empty
             mBPM.add(bpm); //Add the sample to the array
             startTime = SystemClock.elapsedRealtime(); //Initializes the timer in order to calculate event's duration
