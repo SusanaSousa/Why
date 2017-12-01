@@ -14,11 +14,14 @@ public class Event {
     User user;
     long eventID;
     Date date;
-    Image photo;
+    String photo_start_front; //Variables where the path of the images will be saved.
+    String photo_start_rear;
+    String photo_end_front;
+    String photo_end_rear;
+    String notes;
     double latitude;
     double longitude;
-    double timeRR;
-    double bodyTemp;
+    double hearRate;
     double duration;
 
     //Constructor
@@ -26,17 +29,18 @@ public class Event {
     public Event(){
 
     }
-    public Event(User user, Date date, Image photo, double latitude, double longitude, double timeRR, double bodyTemp, double duration){
+    public Event(User user, Date date, String photo_start_front, String photo_start_rear, String photo_end_front, String photo_end_rear, String notes, double latitude, double longitude, double hearRate, double duration){
         this.user=user;
         this.date=date;
-        this.photo=photo;
+        this.photo_start_front=photo_start_front;
+        this.photo_start_rear=photo_start_rear;
+        this.photo_end_front=photo_end_front;
+        this.photo_end_rear=photo_end_rear;
+        this.notes=notes;
         this.latitude=latitude;
         this.longitude=longitude;
-        this.timeRR=timeRR;
-        this.bodyTemp=bodyTemp;
+        this.hearRate=hearRate;
         this.duration=duration;
-
-
     }
 
     //All necessary getting and setting methods
@@ -47,15 +51,7 @@ public class Event {
     public Date getDate(){
         return this.date;
     }
-    public void setDate(Date date){
-        this.date=date;
-    }
-    public Image getPhoto(){
-        return this.photo;
-    }
-    public void setPhoto(Image img){
-        this.photo=img;
-    }
+    public void setDate(Date date){this.date=date;}
     public double getLatitude(){
         return this.latitude;
     }
@@ -68,17 +64,11 @@ public class Event {
     public void setLongitude(double longitude){
         this.longitude=longitude;
     }
-    public double getTimeRR(){
-        return this.timeRR;
+    public double getHearRate(){
+        return this.hearRate;
     }
-    public void setTimeRR(double timeRR){
-        this.timeRR=timeRR;
-    }
-    public double getBodyTemp(){
-        return this.bodyTemp;
-    }
-    public void setBodyTemp(double temp){
-        this.bodyTemp=temp;
+    public void setHearRate(double hearRate){
+        this.hearRate=hearRate;
     }
     public double getDuration(){
         return this.duration;
@@ -86,5 +76,11 @@ public class Event {
     public void setDuration(double duration){
         this.duration=duration;
     }
+    public String getPhotoStartFront(){return this.photo_start_front;}
+    public String getPhotoStartRear(){return this.photo_start_rear;}
+    public String getPhotoEndFront(){return this.photo_end_front;}
+    public String getPhotoEndRear(){return this.photo_end_rear;}
+    public String getNotes(){return this.notes;}
+    public void setNotes(String notes){this.notes=notes;}
 
 }

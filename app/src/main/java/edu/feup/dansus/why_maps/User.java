@@ -5,31 +5,23 @@ package edu.feup.dansus.why_maps;
  */
 
 public class User {
-
-    long userID;
     String username;
     String userProfession;
+    String userEmail;
     int userAge;
     int userThreshold;
 
     public User(){}
 
-    public User(long userID, String username, String userProfession, int userAge, int userThreshold){
-        this.userID=userID;
+    public User(String username, String userProfession, String userEmail, int userAge, int userThreshold){
         this.username=username;
         this.userProfession=userProfession;
+        this.userEmail=userEmail;
         this.userAge=userAge;
         this.userThreshold=userThreshold;
     }
 
     //All necessary getting and setting methods
-    public long getUserID(){
-        return this.userID;
-    }
-    public void setUserID(long userID){
-        this.userID=userID;
-    }
-
     public String getUsername(){
         return this.username;
     }
@@ -42,6 +34,8 @@ public class User {
     public void setUserProfession(String profession){
         this.userProfession=profession;
     }
+    public String getUserEmail(){return this.userEmail;}
+    public void setUserEmail(String email){this.userEmail=email;}
     public int getUserAge(){
         return this.userAge;
     }
