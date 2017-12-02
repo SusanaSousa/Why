@@ -87,25 +87,26 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsHolder> {
         Geocoder geocoder;
         List<Address> addresses;
         geocoder = new Geocoder(mContext, Locale.getDefault());
-        String sPlace = new String();
+        String locationTxt = new String();
 
         try {
             addresses = geocoder.getFromLocation(latitude, longitude, 1);
-            String address = addresses.get(0).getAddressLine(0);
-            String city = addresses.get(0).getAddressLine(1);
-            String country = addresses.get(0).getAddressLine(2);
 
-            String[] splitAddress = address.split(",");
-            sPlace = splitAddress[0] + "\n";
-            if (city != null && !city.isEmpty()) {
-                String[] splitCity = city.split(",");
-                sPlace += splitCity[0];
+            if (addresses != null && addresses.size() > 0) {
+                String address = addresses.get(0).getAddressLine(0);
+                String city = addresses.get(0).getLocality();
+                String state = addresses.get(0).getAdminArea();
+                String country = addresses.get(0).getCountryName();
+                String postalCode = addresses.get(0).getPostalCode();
+                String knownName = addresses.get(0).getFeatureName();
+
+                locationTxt=address;
             }
-
         } catch (IOException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
-        return sPlace;
+        return locationTxt;
     }
 }
