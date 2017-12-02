@@ -3,6 +3,7 @@ package edu.feup.dansus.why_maps;
 import android.app.Application;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by dany on 25-11-2017.
@@ -33,17 +34,15 @@ public class WhyApp extends Application {
 
         currentUser = sampleUser;
 
-        /*
         Event sampleEvent = new Event();
         Double time = (double) 4;
         Date date = new Date();
         sampleEvent.user=sampleUser;
         sampleEvent.duration = time;
-        sampleEvent.bodyTemp = 37;
         sampleEvent.date = date;
         sampleEvent.latitude = 41.183208;
         sampleEvent.longitude = -8.583512;
-        sampleEvent.timeRR = 5;
+        sampleEvent.hearRate = 5;
 
         db.addEvent(sampleEvent);
 
@@ -51,13 +50,12 @@ public class WhyApp extends Application {
         Event sampleEvent2 = new Event();
         Double time2 = (double) 2;
         Date date2 = new Date();
-        sampleEvent2.user=sampleUser2;
+        sampleEvent2.user=sampleUser;
         sampleEvent2.duration = time2;
-        sampleEvent2.bodyTemp = 38;
         sampleEvent2.date = date;
         sampleEvent2.latitude =41.177063;
         sampleEvent2.longitude = -8.594091;
-        sampleEvent2.timeRR = 8;
+        sampleEvent2.hearRate = 8;
 
         db.addEvent(sampleEvent2);
 

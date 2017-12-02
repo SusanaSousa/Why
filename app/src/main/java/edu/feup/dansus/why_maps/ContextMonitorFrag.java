@@ -4,6 +4,10 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -12,9 +16,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.annotation.ColorInt;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
@@ -36,6 +44,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -213,28 +223,6 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
     }
 
 
-    // Getting a BitmapDescriptor from a .xml defined icon
-    // Source: https://gist.github.com/Ozius/1ef2151908c701854736
-
-    /* private BitmapDescriptor getBitmapDescriptor(int id) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            VectorDrawable vectorDrawable = (VectorDrawable) getActivity().getResources().getDrawable(id, getActivity().getTheme());
-
-            int h = vectorDrawable.getIntrinsicHeight();
-            int w = vectorDrawable.getIntrinsicWidth();
-
-            vectorDrawable.setBounds(0, 0, w, h);
-
-            Bitmap bm = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bm);
-            vectorDrawable.draw(canvas);
-
-            return BitmapDescriptorFactory.fromBitmap(bm);
-
-        } else {
-            return BitmapDescriptorFactory.fromResource(id);
-        }
-    } */
 
     /**
      * The Handler that gets information back from the BioLib
@@ -549,7 +537,7 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
         dbHandler.close();
 
         // Loading events
-        for (int i=0; i<mEvents.size(); i++){
+        for (int i=0; i < mEvents.size(); i++){
             latitude=mEvents.get(i).getLatitude();
             longitude=mEvents.get(i).getLongitude();
             LatLng newEvent= new LatLng(latitude, longitude);
@@ -557,12 +545,33 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
         }
 
 
-        // Add a marker for all events in DB
+        // Add a marker for all the events in DB
+
+        // Custom marker icon
+        // BitmapDescriptor customMarker = BitmapDescriptorFactory.fromBitmap(vectorToBitmap(R.drawable.ic_location_on_black_24dp));
+
         for (int i=0; i < eventLoc.size();i++){
             mMap.addMarker(new MarkerOptions()
                     .position(eventLoc.get(i))
-                    .title("Event "+ i)); // TODO: custom marker
+                    .title("Event "+ i));
+                    //.icon(customMarker));
         }
+    }
+
+
+    /**
+     * Demonstrates converting a {@link Drawable} to a {@link BitmapDescriptor},
+     * for use as a marker icon. Workaround adapted from code
+     * originally by the Google Maps team
+     */
+    private Bitmap vectorToBitmap(@DrawableRes int id) {
+        Drawable vectorDrawable = ResourcesCompat.getDrawable(getResources(), id, null);
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
+                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        vectorDrawable.draw(canvas);
+        return bitmap;
     }
 }
 

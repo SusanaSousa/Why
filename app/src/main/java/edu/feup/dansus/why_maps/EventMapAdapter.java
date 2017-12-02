@@ -50,8 +50,8 @@ public class EventMapAdapter implements GoogleMap.InfoWindowAdapter {
 
         //Populate fields
         //Event Date
-        TextView eventDate=(TextView) view.findViewById(R.id.eventDate_tv);
-        eventDate.setText(formatEventData(event.getDate())); //Setting date as a string
+        TextView eventOn=(TextView) view.findViewById(R.id.eventOn_tv);
+        eventOn.setText("Event on " + formatEventData(event.getDate())); //Setting date as a string
 
         //Event Duration
         TextView eventDuration=(TextView) view.findViewById(R.id.setDuration_tv);
@@ -59,7 +59,7 @@ public class EventMapAdapter implements GoogleMap.InfoWindowAdapter {
 
         //Heart Rate
         TextView heartRate=(TextView) view.findViewById(R.id.setHearRate_tv);
-        heartRate.setText(Double.toString(event.getTimeRR())); //Setting heartRate from double to string
+        heartRate.setText(Double.toString(event.getHearRate())); //Setting heartRate from double to string
 
         return view;
     }
