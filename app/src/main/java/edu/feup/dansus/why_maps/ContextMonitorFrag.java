@@ -48,6 +48,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
@@ -92,6 +93,7 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
     private Location startLoc;
     private Location endLoc;
     private MediaPlayer mPlayer;
+    private EventMapAdapter mapAdapter;
 
     //Buffer
     // CircularFifoQueue<Integer> queue = new CircularFifoQueue(5); //buffering data
@@ -209,15 +211,34 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
     }
 
     @Override
-    public void onMapReady(GoogleMap map){ // Map is ready!
+    public void onMapReady(final GoogleMap map){ // Map is ready!
         mMap = map;
 
-        map.setInfoWindowAdapter(new EventMapAdapter(getLayoutInflater(),mEvents));
+        mapAdapter = new EventMapAdapter(getLayoutInflater());
+        map.setInfoWindowAdapter(mapAdapter);
 
         // Enabling Current location and moving the camera there
         mMap.setMyLocationEnabled(true); // By this time, we will have the required permissions (fragment doesn't launch without it)
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.setBuildingsEnabled(true);
+
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                // Getting the clicked event ID
+                long currentID = 0;
+                double lat = marker.getPosition().latitude;
+                double lon = marker.getPosition().longitude;
+
+                for (Event ev: mEvents){
+                    if (ev.getLatitude() == lat && ev.getLongitude() == lon){
+                        currentID = ev.getEventID();
+                    }
+                }
+                showAddNotesDialog(currentID); // Showing the fragment
+                Log.i("Oi","Oi");
+            }
+        });
 
         loadEventsToMap();
     }
@@ -548,13 +569,13 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
         // Add a marker for all the events in DB
 
         // Custom marker icon
-        // BitmapDescriptor customMarker = BitmapDescriptorFactory.fromBitmap(vectorToBitmap(R.drawable.ic_location_on_black_24dp));
+        BitmapDescriptor customMarker = BitmapDescriptorFactory.fromBitmap(vectorToBitmap(R.drawable.ic_location_on_black_24dp));
 
         for (int i=0; i < eventLoc.size();i++){
             mMap.addMarker(new MarkerOptions()
                     .position(eventLoc.get(i))
-                    .title("Event "+ i));
-                    //.icon(customMarker));
+                    .title("Event "+ i)
+                    .icon(customMarker));
         }
     }
 
@@ -572,6 +593,11 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
         vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         vectorDrawable.draw(canvas);
         return bitmap;
+    }
+
+    private void showAddNotesDialog(long id) {
+        AddNotesDialog dialog = AddNotesDialog.newInstance(id);
+        dialog.show(getActivity().getSupportFragmentManager(),"add_notes_dialog");
     }
 }
 

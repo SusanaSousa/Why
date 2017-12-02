@@ -23,7 +23,6 @@ xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/eventOn_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Event on Wed, Dec 2, 16:04"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:textStyle="bold"
@@ -61,6 +60,7 @@ xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="Duration"
+            android:textColor="@color/black"
             android:textStyle="bold"
             android:layout_gravity="center_vertical"/>
 
@@ -95,6 +95,7 @@ xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_weight="1"
             android:hint="HR value"
             android:textStyle="bold"
+            android:textColor="@color/black"
             android:layout_gravity="center_vertical"/>
     </LinearLayout>
 
@@ -207,6 +208,7 @@ xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:tint="@color/lightGrey"
+            android:layout_gravity="center_vertical"
             app:srcCompat="@drawable/ic_edit_black_24dp" />
 
         <TextView
@@ -222,16 +224,16 @@ xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/notesContent_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:hint="Event notes"
             android:layout_gravity="center_vertical"
             android:textStyle="italic"
-            android:text="Not the greatest moment of my life!"
+            android:textColor="@color/black"
             android:inputType="textMultiLine"/>
     </LinearLayout>
 
 
     <Button style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:id="@+id/notes_btn"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="right"

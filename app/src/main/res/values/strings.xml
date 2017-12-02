@@ -34,4 +34,7 @@
     <string name="RecordString">Recording event...</string>
     <string name="StopEventString">Event stopped</string>
     <string name="NotesString_tv">Notes:</string>
+    <string name="cancel_bt">Back</string>
+    <string name="add_bt">Save</string>
+    <string name="eventNotes_tv">Event Notes</string>
 </resources>
