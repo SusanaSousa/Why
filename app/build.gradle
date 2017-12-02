@@ -34,4 +34,5 @@ dependencies {
     compile 'com.google.android.gms:play-services-location:11.6.0'
     implementation files('libs/biolib.sdk.jar')
     compile 'org.apache.commons:commons-collections4:4.1'
+    compile 'de.hdodenhof:circleimageview:2.2.0'
 }

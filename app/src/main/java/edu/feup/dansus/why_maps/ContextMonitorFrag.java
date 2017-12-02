@@ -5,6 +5,9 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -78,10 +81,14 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
     private Location mLocation; // current location
     private Location startLoc;
     private Location endLoc;
+    private MediaPlayer mPlayer;
 
     //Buffer
     // CircularFifoQueue<Integer> queue = new CircularFifoQueue(5); //buffering data
 
+    // Play sound when event goes above EVENT_ALARM_THRESH
+    private static final int EVENT_ALARM_THRESH = 60000;
+    private boolean hasAlarmPlayed = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
@@ -171,7 +178,11 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
             }
 
             case R.id.action_heart: {
-                isPartOfUserEvent = true;
+                if (connectionState && isMonitoring) {
+                    isPartOfUserEvent = true;
+                    break;
+                }
+
                 break;
             }
         }
@@ -200,6 +211,7 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
 
         loadEventsToMap();
     }
+
 
     // Getting a BitmapDescriptor from a .xml defined icon
     // Source: https://gist.github.com/Ozius/1ef2151908c701854736
@@ -328,6 +340,7 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
             isPartOfUserEvent = false;
             isPartOfEvent = false;
             isMonitoring = false;
+            hasAlarmPlayed = false;
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -370,13 +383,17 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
         int threshold=app.currentUser.getUserThreshold(); // here we will call user threshold
 
         //Check is the current sample is part of an Event or not
-        if (bpm < 1.10*threshold || bpm > 0.9*threshold){
+        if (bpm > 0.95*threshold){
             isPartOfEvent = true;
-        };
+        } else {
+            isPartOfEvent = false;
+        }
+
+        // TODO: Deal with user events: spontaneous
 
         // Dealing with isEventHappening and isPartOfEvent possible combinations
 
-        if (isEventHappening==false && (isPartOfEvent==true || isPartOfUserEvent==true)){ //the event is not happening and this is the sample that initializes the event
+        if (isEventHappening==false && isPartOfEvent==true){ //the event is not happening and this is the sample that initializes the event
             mBPM.clear(); //We know that this is the first element, so here we clear the array making sure it is empty
             mBPM.add(bpm); //Add the sample to the array
             startTime = SystemClock.elapsedRealtime(); //Initializes the timer in order to calculate event's duration
@@ -384,12 +401,24 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
             startLoc = mLocation;
 
             isEventHappening=true;
+            hasAlarmPlayed = false;
 
             // User feedback
             Toast.makeText(app, R.string.RecordString, Toast.LENGTH_SHORT).show();
 
         }else if (isEventHappening==true && isPartOfEvent==true){
             mBPM.add(bpm);
+
+            long timeSinceStart = SystemClock.elapsedRealtime() - startTime;
+
+            if (timeSinceStart > EVENT_ALARM_THRESH && !hasAlarmPlayed){ // We play an alert sound if event is too long
+                mPlayer = MediaPlayer.create(this.getContext(), R.raw.eye_tiger);
+                mPlayer.start(); // Start playing
+                hasAlarmPlayed = true;
+            }
+
+
+
         }else if (isEventHappening==true && isPartOfEvent==false){ //the event is happening and ends here
             endTime = SystemClock.elapsedRealtime();
             //trigger to take photo
@@ -505,7 +534,7 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
         Date date = new Date();
 
         // Creating the event object and adding it to the DB
-        Event currentEvent = new Event(app.currentUser, date, null, avgLocation.latitude, avgLocation.longitude, avgBPM, (double)0, duration);
+        Event currentEvent = new Event(app.currentUser, date, "", "", "", "", "", avgLocation.latitude, avgLocation.longitude, avgBPM, duration);
         dbHandler.addEvent(currentEvent);
         loadEventsToMap();
     }

@@ -18,7 +18,7 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="16sp"
         android:visibility="invisible"
-        android:padding="8sp"
+        android:padding="12sp"
         app:srcCompat="@drawable/ic_fiber_manual_record_black_24dp" />
 
     </RelativeLayout>
