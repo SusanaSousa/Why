@@ -25,8 +25,8 @@ public class WhyActivity extends AppCompatActivity {
     private FragmentManager fragMan;
     private DrawerLayout drawer;
     private NavigationView navView;
-    private static final int LOCATION_REQUEST = 1;
-    private String[] locPermissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+    private static final int PERM_REQUEST = 1;
+    private String[] locPermissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +48,6 @@ public class WhyActivity extends AppCompatActivity {
 
         navView = (NavigationView) findViewById(R.id.nav_view);
         setupDrawer(navView);
-
 
         // Context monitor is the default fragment
         checkAndLaunchContextMonitor();
@@ -167,9 +166,12 @@ public class WhyActivity extends AppCompatActivity {
     private void checkAndLaunchContextMonitor(){
         // Checking for the required location permissions
         if ((ActivityCompat.checkSelfPermission(this, locPermissions[0]) != PackageManager.PERMISSION_GRANTED)
-                && (ActivityCompat.checkSelfPermission(this, locPermissions[1]) != PackageManager.PERMISSION_GRANTED)){
-            ActivityCompat.requestPermissions(this, new String[] {locPermissions[0], locPermissions[1]}, LOCATION_REQUEST); // Requesting the permissions
-        } else { // If permissions exists, we launch the fragment directly
+                && (ActivityCompat.checkSelfPermission(this, locPermissions[1]) != PackageManager.PERMISSION_GRANTED)
+                && (ActivityCompat.checkSelfPermission(this, locPermissions[2]) != PackageManager.PERMISSION_GRANTED)
+                && (ActivityCompat.checkSelfPermission(this, locPermissions[3]) != PackageManager.PERMISSION_GRANTED)) {
+            ActivityCompat.requestPermissions(this, new String[]{locPermissions[0], locPermissions[1], locPermissions[2], locPermissions[3]}, PERM_REQUEST);
+        }// Requesting the permissions
+        else { // If permissions exists, we launch the fragment directly
             launchFrag(ContextMonitorFrag.class);
         }
     }
@@ -182,9 +184,9 @@ public class WhyActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         Log.e("Req Code", "" + requestCode);
-        if (requestCode == LOCATION_REQUEST) {
+        if (requestCode == PERM_REQUEST) {
             if (grantResults.length == 1 &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED ) {
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 launchFrag(ContextMonitorFrag.class);
             }
             else{

@@ -5,8 +5,10 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.media.AudioManager;
@@ -55,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TreeMap;
 
 import Bio.Library.namespace.BioLib;
 
@@ -63,7 +66,7 @@ import Bio.Library.namespace.BioLib;
  * Context monitor screen
  */
 
-public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, PictureCapturingListener {
     private SupportMapFragment mapFragment; // Map will be a fragment
     private GoogleMap mMap;
     private List<Event> mEvents = new ArrayList<>(); // Array pointing to the global events array
@@ -95,6 +98,15 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
     private MediaPlayer mPlayer;
     private EventMapAdapter mapAdapter;
 
+    // Cameras
+    private String startFrontPic = null;
+    private String startRearPic = null;
+    private String endFrontPic = null;
+    private String endRearPic = null;
+    private APictureCapturingService pictureService; // picture capturing service
+    private int picCounter = 0; // we can't use the boolean event status, because pictures are delivered async
+
+
     //Buffer
     // CircularFifoQueue<Integer> queue = new CircularFifoQueue(5); //buffering data
 
@@ -108,6 +120,9 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
 
         // Getting a reference to the activity's DB Handler
         dbHandler = new DatabaseHandler(this.getActivity());
+
+        // Picture taking service
+        pictureService = PictureCapturingServiceImpl.getInstance(this.getActivity());
 
         // Getting a reference to the global events list
         app = (WhyApp) getActivity().getApplicationContext();
@@ -236,7 +251,6 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
                     }
                 }
                 showAddNotesDialog(currentID); // Showing the fragment
-                Log.i("Oi","Oi");
             }
         });
 
@@ -313,6 +327,7 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
                     isPartOfUserEvent = false;
                     isPartOfEvent = false;
                     isMonitoring = false;
+                    picCounter = 0;
                     break;
 
                 case BioLib.STATE_CONNECTING:
@@ -350,6 +365,7 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
             isPartOfEvent = false;
             isMonitoring = false;
             hasAlarmPlayed = false;
+            picCounter = 0;
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -406,8 +422,11 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
             mBPM.clear(); //We know that this is the first element, so here we clear the array making sure it is empty
             mBPM.add(bpm); //Add the sample to the array
             startTime = SystemClock.elapsedRealtime(); //Initializes the timer in order to calculate event's duration
-            //trigger to take a photo
+
             startLoc = mLocation;
+
+            // Photo trigger
+            pictureService.startCapturing(this);
 
             isEventHappening=true;
             hasAlarmPlayed = false;
@@ -430,7 +449,9 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
 
         }else if (isEventHappening==true && isPartOfEvent==false){ //the event is happening and ends here
             endTime = SystemClock.elapsedRealtime();
-            //trigger to take photo
+
+            pictureService.startCapturing(this);
+
             endLoc = mLocation;
             isEventHappening=false;
             isPartOfUserEvent=false;
@@ -539,11 +560,12 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
         //Interpolate locations
         LatLng avgLocation = getAvgLocation(startLoc, endLoc);
 
-        //Add information to dataBase
+        //Date
         Date date = new Date();
 
         // Creating the event object and adding it to the DB
-        Event currentEvent = new Event(app.currentUser, date, "", "", "", "", "", avgLocation.latitude, avgLocation.longitude, avgBPM, duration);
+        Event currentEvent = new Event(app.currentUser, date, startFrontPic, startRearPic, endFrontPic, endRearPic, "", avgLocation.latitude, avgLocation.longitude, avgBPM, duration);
+        // TODO: As pictures are delivered async, not sure here if this should be called after the last pic is delivered
         dbHandler.addEvent(currentEvent);
         loadEventsToMap();
     }
@@ -599,5 +621,49 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
         AddNotesDialog dialog = AddNotesDialog.newInstance(id);
         dialog.show(getActivity().getSupportFragmentManager(),"add_notes_dialog");
     }
+
+    public static Bitmap RotateBitmap(Bitmap source, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
+
+    @Override // callback when all pictures are taken
+    public void onDoneCapturingAllPhotos(TreeMap<String, byte[]> picturesTaken) {
+
+        if (picturesTaken != null && !picturesTaken.isEmpty()) {    // photos were captured
+            Toast.makeText(this.getContext(), "Picture was taken!", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    @Override
+    public void onCaptureDone(String pictureUrl, byte[] pictureData) { // runs each time a picture (front of rear) is taken
+        if (pictureData != null && pictureUrl != null) { // pictures were successfully taken
+
+            // Optional resizing could happen here (at a bitmap level, which would have to be extracted)
+
+            picCounter += 1;
+
+            if (picCounter < 3){ // start of the event
+            if (pictureUrl.contains("0_pic.jpg")) {
+                    startRearPic = pictureUrl;
+                } else if (pictureUrl.contains("1_pic.jpg")) {
+                    startFrontPic = pictureUrl;
+                }
+            } else { // end of the event
+                if (pictureUrl.contains("0_pic.jpg")) {
+                    endRearPic = pictureUrl;
+                } else if (pictureUrl.contains("1_pic.jpg")) {
+                    endFrontPic = pictureUrl;
+                    // TODO: maybe we should call
+                    picCounter = 0; // we reset the picCounter, after the last front picture
+                }
+            }
+            Toast.makeText(this.getContext(), "Picture saved to " + pictureUrl, Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }
 
