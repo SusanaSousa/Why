@@ -17,11 +17,11 @@ public class EventsHolder extends RecyclerView.ViewHolder {
     public TextView moreContextBt;
     public TextView addNotesBt;
     public ImageView photo;
-    public int adapterPos;
+    public long currentID;
     private FragmentManager frag;
 
 
-    public EventsHolder(View itemView, FragmentManager frag) {
+    public EventsHolder(View itemView, FragmentManager frag, Long id) {
 
         super(itemView);
         weekday = itemView.findViewById(R.id.weekday_tv);
@@ -31,25 +31,39 @@ public class EventsHolder extends RecyclerView.ViewHolder {
         addNotesBt = itemView.findViewById(R.id.addNotes_bt);
         photo=itemView.findViewById(R.id.photo_imgv);
         this.frag = frag;
+        this.currentID=id+1;
 
 
         addNotesBt.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                adapterPos = getAdapterPosition();
-                showAddNotesDialog();
+                showAddNotesDialog(currentID);
+
+            }
+        });
+        
+        moreContextBt.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                showMoreContextDialog(currentID);
 
             }
         });
 
 
     }
-    private void showAddNotesDialog() {
 
-        AddNotesDialog dialog = AddNotesDialog.newInstance();
-        dialog.adapterPos=adapterPos;
+    private void showMoreContextDialog(long id) {
+        MoreContextDialog dialog = MoreContextDialog.newInstance(id);
+        dialog.show(frag,"more_context_dialog");
+    }
+
+    private void showAddNotesDialog(long id) {
+
+        AddNotesDialog dialog = AddNotesDialog.newInstance(id);
         dialog.show(frag,"add_notes_dialog");
+
     }
 
 }

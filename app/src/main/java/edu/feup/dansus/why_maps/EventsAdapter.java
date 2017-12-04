@@ -29,7 +29,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsHolder> {
     private Context mContext;
     ArrayList<Event> mEvents = new ArrayList<>();
     public FragmentManager frag;
-    public int adapterPos;
+    public long eventID;
 
 
 
@@ -48,13 +48,13 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsHolder> {
         LayoutInflater inflater = LayoutInflater.from(context);
         //Inflate the costum layout
         View row = inflater.inflate(R.layout.event_item, parent, false);
-        EventsHolder viewHolder = new EventsHolder(row,frag);
+        EventsHolder viewHolder = new EventsHolder(row,frag,eventID);
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(EventsHolder holder, int position) {
-        adapterPos=holder.adapterPos;
+        eventID=mEvents.get(position).getEventID();
         //Setting weekday
         SimpleDateFormat weekday = new SimpleDateFormat("EEEE", Locale.US); //TODO check if is just a E
         TextView weekday_tv = holder.weekday;

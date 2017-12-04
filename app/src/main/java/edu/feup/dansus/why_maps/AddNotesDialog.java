@@ -24,19 +24,24 @@ import java.util.ArrayList;
 public class AddNotesDialog extends DialogFragment {
     private ArrayList<Event> mEvents = new ArrayList<>(); // Array pointing to the global events array
     private WhyApp app;
-    public int adapterPos;
     private EditText mNotes;
     private DatabaseHandler dbHandler;
+    private long eventID;
 
     public AddNotesDialog(){
         //Empty constructor
     }
 
 
-    public static AddNotesDialog newInstance() {
+    public static AddNotesDialog newInstance(long eventID) {
         AddNotesDialog fragment = new AddNotesDialog();
+
+        Bundle args = new Bundle();
+        args.putLong("ID", eventID);
+        fragment.setArguments(args);
         return fragment; // no frag arguments
     }
+
 
 
     @Override
@@ -48,8 +53,12 @@ public class AddNotesDialog extends DialogFragment {
         // Getting a reference to the global events list
         app = (WhyApp) getActivity().getApplicationContext();
         mEvents = app.events;
-        return inflater.inflate(R.layout.add_notes_dialog, container); // Inflating the layout
 
+        // Extracting fragment arguments
+        Bundle args = getArguments();
+        eventID = args.getLong("ID");
+
+        return inflater.inflate(R.layout.add_notes_dialog, container); // Inflating the layout
     }
 
     @Override
@@ -87,12 +96,19 @@ public class AddNotesDialog extends DialogFragment {
 
     private void addNotesToDB() {
         String notes = mNotes.getText().toString();
-        Event currEvent = mEvents.get(adapterPos);
-        currEvent.notes=notes;
+        Event current = new Event();
 
-        dbHandler.updateEventNotes(currEvent);
+        // Updating in mEvents
+        for (Event ev: mEvents){
+            if (ev.getEventID() == eventID){
+                ev.setNotes(notes);
+                current = ev;
+            }
+        }
+
+        dbHandler.updateEventNotes(current);
+
         dbHandler.close();
-
-
     }
+
 }

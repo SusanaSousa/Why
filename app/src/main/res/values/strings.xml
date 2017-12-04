@@ -41,4 +41,5 @@
     <string name="eventNotes_tv">Event Notes</string>
     <string name="cancel_bt">Cancel</string>
     <string name="add_bt">Add</string>
+    <string name="notes_tv">Notes</string>
 </resources>
