@@ -37,4 +37,9 @@
     <string name="cancel_bt">Back</string>
     <string name="add_bt">Save</string>
     <string name="eventNotes_tv">Event Notes</string>
+    <string name="weekday_tv">Weekday</string>
+    <string name="date_tv">Date</string>
+    <string name="address_tv">Address</string>
+    <string name="moreContext_bt">MORE CONTEXT</string>
+    <string name="addNotes_bt">ADD NOTES</string>
 </resources>

@@ -39,4 +39,6 @@ dependencies {
     implementation files('libs/biolib.sdk.jar')
     compile 'org.apache.commons:commons-collections4:4.1'
     compile 'de.hdodenhof:circleimageview:2.2.0'
+    implementation 'com.android.support:cardview-v7:26.1.0'
+    compile 'com.android.support:recyclerview-v7:26.1.0'
 }

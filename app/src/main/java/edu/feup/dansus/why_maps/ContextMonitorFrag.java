@@ -184,7 +184,6 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-
         switch (item.getItemId()) {
             case R.id.action_bluetooth: {
 
@@ -279,6 +278,10 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
                 case BioLib.MESSAGE_PEAK_DETECTION:
                     BioLib.QRS qrs = (BioLib.QRS)msg.obj;
                     Log.i("HR Info", "PEAK: " + qrs.position + "  BPMi: " + qrs.bpmi + " bpm  BPM: " + qrs.bpm + " bpm  R-R: " + qrs.rr + " ms");
+
+                    if (isMonitoring && isPartOfUserEvent){
+                        processInsUserEvent(qrs.bpm);
+                    }
 
                     if (isMonitoring){
                         processBPMInfo(qrs.bpm);
@@ -458,6 +461,29 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
             processEventInfo(mBPM, mLocs,startTime, endTime, startLoc, endLoc);
             Toast.makeText(app, R.string.StopEventString, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void processInsUserEvent(int bpm) {
+
+        //The event's duration is defined as 1s
+        double duration = 1; //seconds
+
+        //location - in this case there is no need to interpolate locations. Only the startlocation is considered
+        startLoc = mLocation;
+
+        //Add information to dataBase
+        Date date = new Date();
+
+        // Creating the event object and adding it to the DB
+        Event currentEvent = new Event (app.currentUser,date, null, null, null, null, null,startLoc.getLatitude(), startLoc.getLongitude(),bpm,duration);
+        dbHandler.addEvent(currentEvent);
+        app.events = dbHandler.getAllEvents();
+        dbHandler.close();
+
+        //after processing this user triggered event, the status returns to false;
+        isPartOfUserEvent=false;
+
+        loadEventsToMap();
     }
 
     // Google Location Services overrides
@@ -657,7 +683,7 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
                     endRearPic = pictureUrl;
                 } else if (pictureUrl.contains("1_pic.jpg")) {
                     endFrontPic = pictureUrl;
-                    // TODO: maybe we should call
+                    // TODO: maybe we should call processBPMInfo()
                     picCounter = 0; // we reset the picCounter, after the last front picture
                 }
             }

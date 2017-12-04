@@ -135,5 +135,6 @@
     <orderEntry type="library" name="com.android.support:transition-26.1.0" level="project" />
     <orderEntry type="library" name="com.google.android.gms:play-services-base-11.6.0" level="project" />
     <orderEntry type="library" name="__local_aars__:/home/dany/AndroidStudioProjects/Why/app/libs/biolib.sdk.jar:unspecified@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:cardview-v7-26.1.0" level="project" />
   </component>
 </module>

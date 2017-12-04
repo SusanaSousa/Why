@@ -1,0 +1,244 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+
+        android:padding="5dp">
+
+        <TextView
+            android:id="@+id/eventOn_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:paddingTop="3dp"
+            android:textAlignment="center"
+            android:text="@string/eventOn_tv" />
+
+        <TextView
+            android:id="@+id/weekday_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:paddingLeft="5dp"
+            android:text="TextView"
+            android:textAlignment="center" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/min_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <ImageView
+            android:id="@+id/alert_img"
+            android:layout_width="53dp"
+            android:layout_height="34dp"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:layout_weight="1"
+            android:tint="#C62828"
+            app:srcCompat="?android:attr/alertDialogIcon" />
+
+        <TextView
+            android:id="@+id/eventDate_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:layout_weight="1"
+            android:text="@string/eventDate_tv"
+            android:textColor="@color/black"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <ImageView
+            android:id="@+id/duration_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tint="@color/lightGrey"
+            app:srcCompat="@drawable/ic_access_time_black_24dp" />
+
+
+        <TextView
+            android:id="@+id/duration_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text="@string/duration_tv" />
+
+        <TextView
+            android:id="@+id/setDuration_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/black"
+            android:text="duration" />
+
+        <TextView
+            android:id="@+id/min"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingLeft="4dp"
+            android:text="min"
+            android:textColor="@color/black" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <ImageView
+            android:id="@+id/heart_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tint="@color/lightGrey"
+            app:srcCompat="@drawable/ic_favorite_black_24dp" />
+
+        <TextView
+            android:id="@+id/heartRate_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text="@string/heartRate_tv" />
+
+        <TextView
+            android:id="@+id/setHearRate_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="HR"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/bpm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingLeft="4dp"
+            android:text="bpm"
+            android:textColor="@color/black" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <ImageView
+            android:id="@+id/camerafront_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tint="@color/lightGrey"
+            app:srcCompat="@drawable/ic_camera_front_black_24dp" />
+
+        <ImageView
+            android:id="@+id/camerarear_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tint="@color/lightGrey"
+            app:srcCompat="@drawable/ic_camera_rear_black_24dp" />
+
+        <TextView
+            android:id="@+id/cameras_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cameras_tv" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:padding="4sp">
+
+        <ImageView
+            android:id="@+id/front_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="4sp"
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/heart_broken" />
+
+        <ImageView
+            android:id="@+id/rear_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="4sp"
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/heart_broken" />
+
+        <ImageView
+            android:id="@+id/front_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="4sp"
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/heart_broken" />
+
+        <ImageView
+            android:id="@+id/rear_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="4sp"
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/heart_broken" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <ImageView
+            android:id="@+id/notes_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tint="@color/lightGrey"
+            app:srcCompat="@drawable/ic_edit_black_24dp" />
+
+        <TextView
+            android:id="@+id/notes_tv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/notes_tv" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/userNotestv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:textColor="@color/black"
+        android:text="TextView" />
+
+</LinearLayout>
