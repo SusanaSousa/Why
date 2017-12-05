@@ -40,6 +40,7 @@ public class EventsFrag extends Fragment {
         //Setting the adapter
         mEventsAdapter = new EventsAdapter(getActivity().getApplicationContext(),this.getFragmentManager());
         mRecyclerView.setAdapter(mEventsAdapter);
+        mEventsAdapter.notifyDataSetChanged();
 
         return view;
     }

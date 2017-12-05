@@ -30,11 +30,11 @@ public class WhyApp extends Application {
         sampleUser.username = "Susana";
         sampleUser.userAge = 22;
         sampleUser.userProfession = "Engenheira";
-        sampleUser.userThreshold = 160;
+        sampleUser.userThreshold = 200;
 
         currentUser = sampleUser;
 
-        Event sampleEvent = new Event();
+        /*Event sampleEvent = new Event();
         Double time = (double) 4;
         Date date = new Date();
         sampleEvent.user=sampleUser;
@@ -57,7 +57,9 @@ public class WhyApp extends Application {
         sampleEvent2.longitude = -8.594091;
         sampleEvent2.hearRate = 8;
 
+
         db.addEvent(sampleEvent2);
+        */
 
         // Create sample data
         /*Event sampleEvent3 = new Event();

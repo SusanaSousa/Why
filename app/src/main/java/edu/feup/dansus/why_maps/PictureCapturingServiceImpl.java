@@ -29,10 +29,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Queue;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -243,7 +246,12 @@ public class PictureCapturingServiceImpl extends APictureCapturingService {
 
     private void saveImageToDisk(final byte[] bytes) {
         final String cameraId = this.cameraDevice == null ? UUID.randomUUID().toString() : this.cameraDevice.getId();
-        final File file = new File(Environment.getExternalStorageDirectory() + "/" + cameraId + "_pic.jpg");
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_", Locale.US);
+        Date now = new Date();
+        String fileName = formatter.format(now);
+
+        final File file = new File(Environment.getExternalStorageDirectory() + "/" + fileName + cameraId + "_pic.jpg");
         try (final OutputStream output = new FileOutputStream(file)) {
             output.write(bytes);
             this.picturesTaken.put(file.getPath(), bytes);

@@ -42,8 +42,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_EVENT_DATE = "date_time";
     private static final String KEY_EVENT_PHOTO_START_FRONT="photo_start_front";
     private static final String KEY_EVENT_PHOTO_START_REAR="photo_start_rear";
-    private static final String KEY_EVENT_PHOTO_END_FRONT="photo_end_front";
-    private static final String KEY_EVENT_PHOTO_END_REAR="photo_end_rear";
     private static final String KEY_EVENT_GPS_LAT = "gps_lat";
     private static final String KEY_EVENT_GPS_LONG = "gps_long";
     private static final String KEY_EVENT_RR = "RR_time";
@@ -78,8 +76,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 KEY_EVENT_DATE + " TEXT," +
                 KEY_EVENT_PHOTO_START_FRONT + " TEXT," +
                 KEY_EVENT_PHOTO_START_REAR + " TEXT," +
-                KEY_EVENT_PHOTO_END_FRONT + " TEXT," +
-                KEY_EVENT_PHOTO_END_REAR + " TEXT," +
                 KEY_EVENT_GPS_LAT + " REAL," +
                 KEY_EVENT_GPS_LONG + " REAL," +
                 KEY_EVENT_RR + " REAL," +
@@ -114,8 +110,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(KEY_EVENT_USER_ID_FK, userId);
             values.put(KEY_EVENT_PHOTO_START_FRONT, event.getPhotoStartFront());
             values.put(KEY_EVENT_PHOTO_START_REAR, event.getPhotoStartRear());
-            values.put(KEY_EVENT_PHOTO_END_FRONT, event.getPhotoEndFront());
-            values.put(KEY_EVENT_PHOTO_END_REAR, event.getPhotoEndRear());
             values.put(KEY_EVENT_DATE, formatDateToString(event.getDate()));
             values.put(KEY_EVENT_GPS_LAT , event.getLatitude());
             values.put(KEY_EVENT_GPS_LONG, event.getLongitude());
@@ -214,8 +208,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     newEvent.date=formatStringtToDate(cursor.getString(cursor.getColumnIndex(KEY_EVENT_DATE)));
                     newEvent.photo_start_front=cursor.getString(cursor.getColumnIndex(KEY_EVENT_PHOTO_START_FRONT));
                     newEvent.photo_start_rear=cursor.getString(cursor.getColumnIndex(KEY_EVENT_PHOTO_START_REAR));
-                    newEvent.photo_end_front=cursor.getString(cursor.getColumnIndex(KEY_EVENT_PHOTO_END_FRONT));
-                    newEvent.photo_end_rear=cursor.getString(cursor.getColumnIndex(KEY_EVENT_PHOTO_END_REAR));
                     newEvent.latitude=Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_EVENT_GPS_LAT)));
                     newEvent.longitude=Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_EVENT_GPS_LONG)));
                     newEvent.hearRate = Double.parseDouble(cursor.getString(cursor.getColumnIndex(KEY_EVENT_RR)));

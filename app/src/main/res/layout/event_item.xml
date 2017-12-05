@@ -20,11 +20,13 @@
 
         <ImageView
             android:id="@+id/photo_imgv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="80sp"
+            android:layout_height="200sp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
+            android:scaleType="fitXY"
+            android:padding="4sp"
             app:srcCompat="@mipmap/ic_launcher_round" />
 
         <TextView

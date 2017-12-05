@@ -16,26 +16,23 @@ public class Event {
     Date date;
     String photo_start_front; //Variables where the path of the images will be saved.
     String photo_start_rear;
-    String photo_end_front;
-    String photo_end_rear;
     String notes;
     double latitude;
     double longitude;
     double hearRate;
     double duration;
 
+
     //Constructor
 
     public Event(){
 
     }
-    public Event(User user, Date date, String photo_start_front, String photo_start_rear, String photo_end_front, String photo_end_rear, String notes, double latitude, double longitude, double hearRate, double duration){
+    public Event(User user, Date date, String photo_start_front, String photo_start_rear, String notes, double latitude, double longitude, double hearRate, double duration){
         this.user=user;
         this.date=date;
         this.photo_start_front=photo_start_front;
         this.photo_start_rear=photo_start_rear;
-        this.photo_end_front=photo_end_front;
-        this.photo_end_rear=photo_end_rear;
         this.notes=notes;
         this.latitude=latitude;
         this.longitude=longitude;
@@ -78,8 +75,6 @@ public class Event {
     }
     public String getPhotoStartFront(){return this.photo_start_front;}
     public String getPhotoStartRear(){return this.photo_start_rear;}
-    public String getPhotoEndFront(){return this.photo_end_front;}
-    public String getPhotoEndRear(){return this.photo_end_rear;}
     public String getNotes(){return this.notes;}
     public void setNotes(String notes){this.notes=notes;}
 

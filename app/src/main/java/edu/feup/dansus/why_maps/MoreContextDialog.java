@@ -1,5 +1,6 @@
 package edu.feup.dansus.why_maps;
 
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -94,7 +96,11 @@ public class MoreContextDialog extends DialogFragment {
         TextView notes=(TextView) view.findViewById(R.id.userNotestv);
         notes.setText(current.getNotes());
 
-
+        // Setting photos
+        ImageView imgFront = (ImageView) view.findViewById(R.id.front_start);
+        ImageView imgRear = (ImageView) view.findViewById(R.id.rear_start);
+        imgFront.setImageBitmap(BitmapFactory.decodeFile(current.getPhotoStartFront()));
+        imgRear.setImageBitmap(BitmapFactory.decodeFile(current.getPhotoStartRear()));
     }
 
 

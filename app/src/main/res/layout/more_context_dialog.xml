@@ -176,8 +176,8 @@
 
         <ImageView
             android:id="@+id/front_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="200sp"
             android:layout_weight="1"
             android:padding="4sp"
             android:scaleType="fitXY"
@@ -185,26 +185,8 @@
 
         <ImageView
             android:id="@+id/rear_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:padding="4sp"
-            android:scaleType="fitXY"
-            app:srcCompat="@drawable/heart_broken" />
-
-        <ImageView
-            android:id="@+id/front_end"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:padding="4sp"
-            android:scaleType="fitXY"
-            app:srcCompat="@drawable/heart_broken" />
-
-        <ImageView
-            android:id="@+id/rear_end"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="200sp"
             android:layout_weight="1"
             android:padding="4sp"
             android:scaleType="fitXY"

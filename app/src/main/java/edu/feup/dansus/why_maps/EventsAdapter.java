@@ -1,6 +1,8 @@
 package edu.feup.dansus.why_maps;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.support.v4.app.FragmentManager;
@@ -71,8 +73,8 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsHolder> {
         address_tv.setText(add);
 
         //Setting Image - let the image be the first photo taken
-        //((ViewHolder)holder).photo
-
+        Bitmap photo = BitmapFactory.decodeFile(mEvents.get(position).getPhotoStartFront());
+        holder.photo.setImageBitmap(photo);
     }
 
     @Override

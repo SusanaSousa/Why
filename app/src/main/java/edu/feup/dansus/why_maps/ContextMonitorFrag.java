@@ -86,6 +86,7 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
     private boolean isPartOfUserEvent = false;
     private long startTime;
     private long endTime;
+    private int instBPM;
 
     // Location
     private GoogleApiClient mGoogleApiClient;
@@ -101,8 +102,8 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
     // Cameras
     private String startFrontPic = null;
     private String startRearPic = null;
-    private String endFrontPic = null;
-    private String endRearPic = null;
+    //private String endFrontPic = null;
+    //private String endRearPic = null;
     private APictureCapturingService pictureService; // picture capturing service
     private int picCounter = 0; // we can't use the boolean event status, because pictures are delivered async
 
@@ -417,8 +418,6 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
             isPartOfEvent = false;
         }
 
-        // TODO: Deal with user events: spontaneous
-
         // Dealing with isEventHappening and isPartOfEvent possible combinations
 
         if (isEventHappening==false && isPartOfEvent==true){ //the event is not happening and this is the sample that initializes the event
@@ -430,7 +429,6 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
 
             // Photo trigger
             pictureService.startCapturing(this);
-
             isEventHappening=true;
             hasAlarmPlayed = false;
 
@@ -452,38 +450,17 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
 
         }else if (isEventHappening==true && isPartOfEvent==false){ //the event is happening and ends here
             endTime = SystemClock.elapsedRealtime();
-
-            pictureService.startCapturing(this);
-
             endLoc = mLocation;
             isEventHappening=false;
-            isPartOfUserEvent=false;
-            processEventInfo(mBPM, mLocs,startTime, endTime, startLoc, endLoc);
+            processEventInfo();
             Toast.makeText(app, R.string.StopEventString, Toast.LENGTH_SHORT).show();
         }
     }
 
     private void processInsUserEvent(int bpm) {
-
-        //The event's duration is defined as 1s
-        double duration = 1; //seconds
-
-        //location - in this case there is no need to interpolate locations. Only the startlocation is considered
-        startLoc = mLocation;
-
-        //Add information to dataBase
-        Date date = new Date();
-
-        // Creating the event object and adding it to the DB
-        Event currentEvent = new Event (app.currentUser,date, null, null, null, null, null,startLoc.getLatitude(), startLoc.getLongitude(),bpm,duration);
-        dbHandler.addEvent(currentEvent);
-        app.events = dbHandler.getAllEvents();
-        dbHandler.close();
-
-        //after processing this user triggered event, the status returns to false;
-        isPartOfUserEvent=false;
-
-        loadEventsToMap();
+        pictureService.startCapturing(this);
+        instBPM = bpm;
+        Toast.makeText(app, R.string.instantaneous_message, Toast.LENGTH_SHORT).show();
     }
 
     // Google Location Services overrides
@@ -574,7 +551,7 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
         return avgLoc;
     }
 
-    private void processEventInfo(ArrayList<Integer> mBPM, ArrayList<LatLng> mLoc, long startTime, long endTime, Location starrLoc, Location endLoc) {
+    private void processEventInfo() {
 
         // Calculate the average heart rate
         double avgBPM=calculateAverage(mBPM);
@@ -590,9 +567,10 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
         Date date = new Date();
 
         // Creating the event object and adding it to the DB
-        Event currentEvent = new Event(app.currentUser, date, startFrontPic, startRearPic, endFrontPic, endRearPic, "", avgLocation.latitude, avgLocation.longitude, avgBPM, duration);
-        // TODO: As pictures are delivered async, not sure here if this should be called after the last pic is delivered
+        Event currentEvent = new Event(app.currentUser, date, startFrontPic, startRearPic, "", avgLocation.latitude, avgLocation.longitude, avgBPM, duration);
         dbHandler.addEvent(currentEvent);
+        WhyApp.events = dbHandler.getAllEvents();
+        dbHandler.close();
         loadEventsToMap();
     }
 
@@ -657,38 +635,59 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
 
     @Override // callback when all pictures are taken
     public void onDoneCapturingAllPhotos(TreeMap<String, byte[]> picturesTaken) {
-
-        if (picturesTaken != null && !picturesTaken.isEmpty()) {    // photos were captured
-            Toast.makeText(this.getContext(), "Picture was taken!", Toast.LENGTH_SHORT).show();
-        }
+//
+//        if (picturesTaken != null && !picturesTaken.isEmpty()) {    // photos were captured
+//            Toast.makeText(this.getContext(), "Picture was taken!", Toast.LENGTH_SHORT).show();
+//        }
 
     }
 
     @Override
-    public void onCaptureDone(String pictureUrl, byte[] pictureData) { // runs each time a picture (front of rear) is taken
+    public void onCaptureDone(String pictureUrl, byte[] pictureData) { // runs each time a picture (front or rear) is taken
         if (pictureData != null && pictureUrl != null) { // pictures were successfully taken
 
             // Optional resizing could happen here (at a bitmap level, which would have to be extracted)
-
             picCounter += 1;
 
-            if (picCounter < 3){ // start of the event
             if (pictureUrl.contains("0_pic.jpg")) {
-                    startRearPic = pictureUrl;
-                } else if (pictureUrl.contains("1_pic.jpg")) {
-                    startFrontPic = pictureUrl;
-                }
-            } else { // end of the event
-                if (pictureUrl.contains("0_pic.jpg")) {
-                    endRearPic = pictureUrl;
-                } else if (pictureUrl.contains("1_pic.jpg")) {
-                    endFrontPic = pictureUrl;
-                    // TODO: maybe we should call processBPMInfo()
-                    picCounter = 0; // we reset the picCounter, after the last front picture
-                }
+                startRearPic = pictureUrl;
+            } else if (pictureUrl.contains("1_pic.jpg")) {
+                startFrontPic = pictureUrl;
             }
+
+            if(picCounter == 2 && isPartOfUserEvent){ // in the final photo of an user event
+                writeUserEventToDB();
+                picCounter = 0;
+            }
+
+            if (picCounter == 2){ // end of the event
+                picCounter = 0;
+            }
+
             Toast.makeText(this.getContext(), "Picture saved to " + pictureUrl, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void writeUserEventToDB(){
+        //The event's duration is defined as 1s
+        double duration = 1; //seconds
+
+        //location - in this case there is no need to interpolate locations. Only the startlocation is considered
+        startLoc = mLocation;
+
+        //Add information to dataBase
+        Date date = new Date();
+
+        // Creating the event object and adding it to the DB
+        Event currentEvent = new Event (app.currentUser,date, startFrontPic, startRearPic, null,startLoc.getLatitude(), startLoc.getLongitude(),instBPM,duration);
+        dbHandler.addEvent(currentEvent);
+        app.events = dbHandler.getAllEvents();
+        dbHandler.close();
+
+        //after processing this user triggered event, the status returns to false;
+        isPartOfUserEvent=false;
+
+        loadEventsToMap();
     }
 
 }

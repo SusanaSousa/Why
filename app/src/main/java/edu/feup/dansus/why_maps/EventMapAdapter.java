@@ -1,10 +1,13 @@
 package edu.feup.dansus.why_maps;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -67,6 +70,16 @@ public class EventMapAdapter implements GoogleMap.InfoWindowAdapter {
         // Notes
         TextView notes = (TextView) view.findViewById(R.id.notesContent_tv);
         notes.setText(mEvent.getNotes());
+
+        // ImageView Front
+        ImageView imgFront = (ImageView) view.findViewById(R.id.front_start);
+        Bitmap frontBitmap = BitmapFactory.decodeFile(mEvent.getPhotoStartFront());
+        imgFront.setImageBitmap(frontBitmap);
+
+        // ImageView Rear
+        ImageView imgRear = (ImageView) view.findViewById(R.id.rear_start);
+        Bitmap rearBitmap = BitmapFactory.decodeFile(mEvent.getPhotoStartRear());
+        imgRear.setImageBitmap(rearBitmap);
 
         return view;
     }

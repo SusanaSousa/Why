@@ -42,4 +42,7 @@
     <string name="address_tv">Address</string>
     <string name="moreContext_bt">MORE CONTEXT</string>
     <string name="addNotes_bt">ADD NOTES</string>
+    <string name="notes_tv">notes</string>
+    <string name="instantaneous_message">Instant event recorded</string>
+
 </resources>
