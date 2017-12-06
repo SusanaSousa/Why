@@ -44,5 +44,11 @@
     <string name="addNotes_bt">ADD NOTES</string>
     <string name="notes_tv">notes</string>
     <string name="instantaneous_message">Instant event recorded</string>
+    <string name="about">About Convertey</string>
+    <string name="developersString"><b>Development</b>: Susana Sousa, Daniel Rodrigues | CMEB, MIB, FEUP</string>
+    <string name="placesString">From Porto with francesinhas, 2017</string>
+    <string name="iconString"><b>Icon</b>: Adapted from <a href="http://www.freepik.com">Freepik</a>, <i>CC-BY-3.0</i></string>
+    <string name="libString"><b>Background photo capture:</b> <a href="https://github.com/botyourbusiness/android-camera2-secret-picture-taker">AC2SPT</a> by <i>hzitoun</i></string>
+    <string name="descriptionString">A physiology-triggered multi-modal context monitor</string>
 
 </resources>

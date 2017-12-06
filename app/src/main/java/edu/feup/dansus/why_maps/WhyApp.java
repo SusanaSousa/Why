@@ -27,9 +27,9 @@ public class WhyApp extends Application {
 
         // Artificial data creation
         User sampleUser = new User();
-        sampleUser.username = "Susana";
+        sampleUser.username = "Elon Musk";
         sampleUser.userAge = 22;
-        sampleUser.userProfession = "Engenheira";
+        sampleUser.userProfession = "Truck Driver";
         sampleUser.userThreshold = 200;
 
         currentUser = sampleUser;

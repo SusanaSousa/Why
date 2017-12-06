@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:elevation="24sp"
+    android:padding="24sp"
+    android:layout_gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/aboutLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="10sp"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/about"
+        android:textColor="@color/black"
+        android:textSize="20sp" />
+
+    <ImageView
+        android:id="@+id/logoImg"
+        android:layout_width="128sp"
+        android:layout_height="128sp"
+        android:layout_gravity="center_horizontal"
+        app:srcCompat="@drawable/web_hi_res_512" />
+
+    <TextView
+        android:id="@+id/descriptionString"
+        android:layout_width="185dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:minLines="2"
+        android:paddingTop="12sp"
+        android:text="@string/descriptionString"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        android:autoLink="web"
+        android:linksClickable="true"/>
+
+    <TextView
+        android:id="@+id/versionLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Version"
+        android:textColor="@color/lightGrey" />
+
+    <TextView
+        android:id="@+id/developmentLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minLines="1"
+        android:paddingTop="12sp"
+        android:text="@string/developersString"
+        android:textColor="@color/darkGrey"
+        android:textSize="12sp" />
+
+
+    <TextView
+        android:id="@+id/libLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autoLink="web"
+        android:linksClickable="true"
+        android:minLines="1"
+        android:paddingTop="12sp"
+        android:text="@string/libString"
+        android:textColor="@color/darkGrey"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/iconLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autoLink="web"
+        android:linksClickable="true"
+        android:minLines="1"
+        android:paddingTop="12sp"
+        android:text="@string/iconString"
+        android:textColor="@color/darkGrey"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/finalLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:autoLink="web"
+        android:foregroundGravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:linksClickable="true"
+        android:minLines="1"
+        android:paddingTop="24sp"
+        android:text="@string/placesString"
+        android:textColor="@color/darkGrey"
+        android:textSize="10sp"
+        android:textStyle="italic" />
+
+</LinearLayout>

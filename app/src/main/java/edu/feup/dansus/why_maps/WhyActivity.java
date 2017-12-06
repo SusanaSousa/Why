@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,7 +20,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.maps.model.Circle;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class WhyActivity extends AppCompatActivity {
 
@@ -89,6 +97,23 @@ public class WhyActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+        // Loading user data into the drawer
+
+        // Name
+        View hView = navView.getHeaderView(0); // getting the navigation drawer header view
+        TextView nameTv = (TextView) hView.findViewById(R.id.nameTv);
+        nameTv.setText(WhyApp.currentUser.getUsername());
+
+        // Profession
+        TextView profTv = (TextView) hView.findViewById(R.id.profTv);
+        profTv.setText(WhyApp.currentUser.getUserProfession());
+
+        // Picture
+        CircleImageView userPic = (CircleImageView) hView.findViewById(R.id.profile_image);
+        Bitmap userPhoto = BitmapFactory.decodeResource(getResources(), R.drawable.musk);
+        userPic.setImageBitmap(userPhoto); // hardcoded profile picture
+
     }
 
     private void launchDrawerFragments(MenuItem item){
