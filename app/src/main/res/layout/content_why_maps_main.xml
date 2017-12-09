@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="edu.feup.dansus.why_maps.WhyMapsMain"
+    tools:context="edu.feup.dansus.why_maps.WhyActivity"
     tools:showIn="@layout/app_bar_why_maps_main">
 
     <fragment

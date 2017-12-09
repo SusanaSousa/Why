@@ -2,6 +2,7 @@ package edu.feup.dansus.why_maps;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
@@ -61,11 +62,11 @@ public class EventMapAdapter implements GoogleMap.InfoWindowAdapter {
 
         //Event Duration
         TextView eventDuration=(TextView) view.findViewById(R.id.setDuration_tv);
-        eventDuration.setText(Double.toString(mEvent.getDuration())); //Setting duration as a string
+        eventDuration.setText(Double.toString(mEvent.getDuration()) + " s"); //Setting duration as a string
 
         //Heart Rate
         TextView heartRate=(TextView) view.findViewById(R.id.setHearRate_tv);
-        heartRate.setText(Double.toString(mEvent.getHearRate())); //Setting heartRate from double to string
+        heartRate.setText(Integer.toString((int)mEvent.getHearRate()) + " bpm"); //Setting heartRate from double to string
 
         // Notes
         TextView notes = (TextView) view.findViewById(R.id.notesContent_tv);
@@ -73,8 +74,13 @@ public class EventMapAdapter implements GoogleMap.InfoWindowAdapter {
 
         // ImageView Front
         ImageView imgFront = (ImageView) view.findViewById(R.id.front_start);
-        Bitmap frontBitmap = BitmapFactory.decodeFile(mEvent.getPhotoStartFront());
-        imgFront.setImageBitmap(frontBitmap);
+        try{
+            Bitmap frontBitmap = RotateBitmap(BitmapFactory.decodeFile(mEvent.getPhotoStartFront()),180);
+            imgFront.setImageBitmap(frontBitmap);
+        }catch(Exception e){
+
+        }
+
 
         // ImageView Rear
         ImageView imgRear = (ImageView) view.findViewById(R.id.rear_start);
@@ -89,4 +95,12 @@ public class EventMapAdapter implements GoogleMap.InfoWindowAdapter {
                 "EEE, d 'of' MMM, HH:mm", Locale.US);
         return dateFormat.format(date);
     }
+
+    public static Bitmap RotateBitmap(Bitmap source, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
+
 }

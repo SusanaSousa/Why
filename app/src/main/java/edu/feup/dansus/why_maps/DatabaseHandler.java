@@ -45,7 +45,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_EVENT_GPS_LAT = "gps_lat";
     private static final String KEY_EVENT_GPS_LONG = "gps_long";
     private static final String KEY_EVENT_RR = "RR_time";
-    private static final String KEY_EVENT_TEMP = "body_temperature";
     private static final String KEY_EVENT_DUR = "event_duration";
     private static final String KEY_EVENT_NOTES= "notes";
 
@@ -79,7 +78,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 KEY_EVENT_GPS_LAT + " REAL," +
                 KEY_EVENT_GPS_LONG + " REAL," +
                 KEY_EVENT_RR + " REAL," +
-                KEY_EVENT_TEMP + " REAL," +
                 KEY_EVENT_DUR + " REAL," +
                 KEY_EVENT_NOTES + " TEXT" +
                 ")";

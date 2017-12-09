@@ -24,8 +24,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.Circle;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class WhyActivity extends AppCompatActivity {
@@ -113,7 +111,6 @@ public class WhyActivity extends AppCompatActivity {
         CircleImageView userPic = (CircleImageView) hView.findViewById(R.id.profile_image);
         Bitmap userPhoto = BitmapFactory.decodeResource(getResources(), R.drawable.musk);
         userPic.setImageBitmap(userPhoto); // hardcoded profile picture
-
     }
 
     private void launchDrawerFragments(MenuItem item){
@@ -221,15 +218,13 @@ public class WhyActivity extends AppCompatActivity {
     }
 
     private void launchFrag(Class fragClass){
-            Fragment frag = null;
+        Fragment frag = null;
 
-            try {
-                frag = (Fragment) fragClass.newInstance();
-                fragMan.beginTransaction().replace(R.id.frag_accepter, frag).commit();
-            } catch (Exception e){
-                e.printStackTrace();
-            }
+        try {
+            frag = (Fragment) fragClass.newInstance();
+            fragMan.beginTransaction().replace(R.id.frag_accepter, frag).commit();
+        } catch (Exception e){
+            e.printStackTrace();
         }
-
-
     }
+}

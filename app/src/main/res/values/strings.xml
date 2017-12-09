@@ -50,5 +50,6 @@
     <string name="iconString"><b>Icon</b>: Adapted from <a href="http://www.freepik.com">Freepik</a>, <i>CC-BY-3.0</i></string>
     <string name="libString"><b>Background photo capture:</b> <a href="https://github.com/botyourbusiness/android-camera2-secret-picture-taker">AC2SPT</a> by <i>hzitoun</i></string>
     <string name="descriptionString">A physiology-triggered multi-modal context monitor</string>
-
+    <string name="emptyMessage">No events yet! GO to Context Monitor to record events</string>
+    <string name="notesHintString">Event notes</string>
 </resources>

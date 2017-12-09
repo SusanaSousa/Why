@@ -34,6 +34,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,7 +76,7 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
     private boolean connectionState=false;
     private BioLib lib = null;
     private WhyApp app;
-    private final static int NUM_SAMPLES = 5;
+    private final static int NUM_SAMPLES = 10;
     private boolean isMonitoring = false;
     private FloatingActionButton playBtn;
     private MenuItem btAppBar;
@@ -222,8 +223,10 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
         // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.why_maps_main, menu);
         this.btAppBar= menu.getItem(1);
+
         super.onCreateOptionsMenu(menu, inflater);
     }
+
 
     @Override
     public void onMapReady(final GoogleMap map){ // Map is ready!
@@ -307,6 +310,7 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
                     // Adjusting buttons
                     btAppBar.setIcon(R.drawable.ic_bluetooth_connected_black_24dp); // Updating the action bar icon
                     playBtn.setVisibility(View.VISIBLE); // Showing record button
+
 
                     // Syncing clocks
                     Date currentDate = Calendar.getInstance().getTime();
@@ -458,9 +462,23 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
     }
 
     private void processInsUserEvent(int bpm) {
-        pictureService.startCapturing(this);
         instBPM = bpm;
-        Toast.makeText(app, R.string.instantaneous_message, Toast.LENGTH_SHORT).show();
+        //The event's duration is defined as 1s
+        double duration = 1; //seconds
+        //location - in this case there is no need to interpolate locations. Only the startlocation is considered
+        startLoc = mLocation;
+        //Add information to dataBase
+        Date date = new Date();
+        // Creating the event object and adding it to the DB
+        Event currentEvent = new Event (app.currentUser,date, null, null, null,startLoc.getLatitude(), startLoc.getLongitude(),instBPM,duration);
+        dbHandler.addEvent(currentEvent);
+        app.events = dbHandler.getAllEvents();
+        dbHandler.close();
+
+        //after processing this user triggered event, the status returns to false;
+        isPartOfUserEvent=false;
+
+        loadEventsToMap();
     }
 
     // Google Location Services overrides
@@ -595,7 +613,7 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
         // Add a marker for all the events in DB
 
         // Custom marker icon
-        BitmapDescriptor customMarker = BitmapDescriptorFactory.fromBitmap(vectorToBitmap(R.drawable.ic_location_on_black_24dp));
+        BitmapDescriptor customMarker = BitmapDescriptorFactory.fromBitmap(vectorToBitmap(R.drawable.ic_location_on_roxo_24dp));
 
         for (int i=0; i < eventLoc.size();i++){
             mMap.addMarker(new MarkerOptions()
@@ -655,40 +673,12 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
                 startFrontPic = pictureUrl;
             }
 
-            if(picCounter == 2 && isPartOfUserEvent){ // in the final photo of an user event
-                writeUserEventToDB();
-                picCounter = 0;
-            }
-
             if (picCounter == 2){ // end of the event
                 picCounter = 0;
             }
 
-            Toast.makeText(this.getContext(), "Picture saved to " + pictureUrl, Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void writeUserEventToDB(){
-        //The event's duration is defined as 1s
-        double duration = 1; //seconds
-
-        //location - in this case there is no need to interpolate locations. Only the startlocation is considered
-        startLoc = mLocation;
-
-        //Add information to dataBase
-        Date date = new Date();
-
-        // Creating the event object and adding it to the DB
-        Event currentEvent = new Event (app.currentUser,date, startFrontPic, startRearPic, null,startLoc.getLatitude(), startLoc.getLongitude(),instBPM,duration);
-        dbHandler.addEvent(currentEvent);
-        app.events = dbHandler.getAllEvents();
-        dbHandler.close();
-
-        //after processing this user triggered event, the status returns to false;
-        isPartOfUserEvent=false;
-
-        loadEventsToMap();
-    }
 
 }
-

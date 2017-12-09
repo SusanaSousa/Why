@@ -30,7 +30,7 @@ public class WhyApp extends Application {
         sampleUser.username = "Elon Musk";
         sampleUser.userAge = 22;
         sampleUser.userProfession = "Truck Driver";
-        sampleUser.userThreshold = 200;
+        sampleUser.userThreshold = 85;
 
         currentUser = sampleUser;
 

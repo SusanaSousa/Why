@@ -3,6 +3,7 @@ package edu.feup.dansus.why_maps;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.location.Address;
 import android.location.Geocoder;
 import android.support.v4.app.FragmentManager;
@@ -73,8 +74,13 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsHolder> {
         address_tv.setText(add);
 
         //Setting Image - let the image be the first photo taken
-        Bitmap photo = BitmapFactory.decodeFile(mEvents.get(position).getPhotoStartFront());
-        holder.photo.setImageBitmap(photo);
+        try {
+            Bitmap photo = RotateBitmap(BitmapFactory.decodeFile(mEvents.get(position).getPhotoStartFront()), 180);
+            holder.photo.setImageBitmap(photo);
+        }catch (Exception e){
+
+        }
+
     }
 
     @Override
@@ -110,5 +116,12 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsHolder> {
         }
 
         return locationTxt;
+    }
+
+    public static Bitmap RotateBitmap(Bitmap source, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 }

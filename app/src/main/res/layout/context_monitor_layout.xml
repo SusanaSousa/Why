@@ -22,4 +22,4 @@
         android:padding="12sp"
         app:srcCompat="@drawable/ic_fiber_manual_record_black_24dp" />
 
-    </RelativeLayout>
+</RelativeLayout>

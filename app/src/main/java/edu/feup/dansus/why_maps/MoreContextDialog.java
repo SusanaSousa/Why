@@ -1,6 +1,8 @@
 package edu.feup.dansus.why_maps;
 
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -90,7 +92,7 @@ public class MoreContextDialog extends DialogFragment {
 
         //Heart Rate
         TextView heartRate=(TextView) view.findViewById(R.id.setHearRate_tv);
-        heartRate.setText(Double.toString(current.getHearRate())); //Setting heartRate from double to string
+        heartRate.setText(Integer.toString((int)current.getHearRate())); //Setting heartRate from double to string
 
         //Notes
         TextView notes=(TextView) view.findViewById(R.id.userNotestv);
@@ -99,8 +101,20 @@ public class MoreContextDialog extends DialogFragment {
         // Setting photos
         ImageView imgFront = (ImageView) view.findViewById(R.id.front_start);
         ImageView imgRear = (ImageView) view.findViewById(R.id.rear_start);
-        imgFront.setImageBitmap(BitmapFactory.decodeFile(current.getPhotoStartFront()));
-        imgRear.setImageBitmap(BitmapFactory.decodeFile(current.getPhotoStartRear()));
+        try {
+            imgFront.setImageBitmap(RotateBitmap(BitmapFactory.decodeFile(current.getPhotoStartFront()), 180));
+            imgRear.setImageBitmap(BitmapFactory.decodeFile(current.getPhotoStartRear()));
+        }catch(Exception e){
+
+        }
+
+    }
+
+    public static Bitmap RotateBitmap(Bitmap source, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
 

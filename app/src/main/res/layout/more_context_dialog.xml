@@ -56,6 +56,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|center_horizontal"
             android:layout_weight="1"
+            android:layout_marginLeft="2sp"
             android:text="@string/eventDate_tv"
             android:textColor="@color/black"
             />
@@ -96,8 +97,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:paddingLeft="4dp"
-            android:text="min"
+            android:layout_marginStart="2sp"
+            android:text="s"
             android:textColor="@color/black" />
 
     </LinearLayout>
@@ -135,7 +136,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:paddingLeft="4dp"
+            android:layout_marginStart="2sp"
             android:text="bpm"
             android:textColor="@color/black" />
     </LinearLayout>
@@ -176,21 +177,21 @@
 
         <ImageView
             android:id="@+id/front_start"
-            android:layout_width="match_parent"
-            android:layout_height="200sp"
+            android:layout_width="200sp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:adjustViewBounds="true"
             android:padding="4sp"
-            android:scaleType="fitXY"
-            app:srcCompat="@drawable/heart_broken" />
+            app:srcCompat="@drawable/ic_flash_on_black_24dp" />
 
         <ImageView
             android:id="@+id/rear_start"
-            android:layout_width="match_parent"
-            android:layout_height="200sp"
+            android:layout_width="200sp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:adjustViewBounds="true"
             android:padding="4sp"
-            android:scaleType="fitXY"
-            app:srcCompat="@drawable/heart_broken" />
+            app:srcCompat="@drawable/ic_flash_on_black_24dp" />
 
     </LinearLayout>
 
@@ -209,17 +210,22 @@
 
         <TextView
             android:id="@+id/notes_tv"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:paddingLeft="5dp"
             android:text="@string/NotesString_tv" />
-    </LinearLayout>
 
-    <TextView
-        android:id="@+id/userNotestv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:textColor="@color/black" />
+        <TextView
+            android:id="@+id/userNotestv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="5dp"
+            android:hint="@string/notesHintString"
+            android:textColorHint="@color/lightGrey"
+            android:textColor="@color/black"
+            android:textStyle="italic" />
+    </LinearLayout>
 
 </LinearLayout>
