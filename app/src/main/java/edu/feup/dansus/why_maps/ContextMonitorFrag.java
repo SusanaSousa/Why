@@ -113,7 +113,8 @@ public class ContextMonitorFrag extends Fragment implements OnMapReadyCallback,G
     // CircularFifoQueue<Integer> queue = new CircularFifoQueue(5); //buffering data
 
     // Play sound when event goes above EVENT_ALARM_THRESH
-    private static final int EVENT_ALARM_THRESH = 60000;
+    private static final int EVENT_ALARM_THRESH = 300000; // our events happen in the high heart rate zone
+    // According to the literature, not even professional athletes spend more than 5min in this HR zone
     private boolean hasAlarmPlayed = false;
 
     @Override

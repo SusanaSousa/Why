@@ -30,7 +30,7 @@ public class WhyApp extends Application {
         sampleUser.username = "Elon Musk";
         sampleUser.userAge = 22;
         sampleUser.userProfession = "Truck Driver";
-        sampleUser.userThreshold = 85;
+        sampleUser.userThreshold = (int) (208 - 0.7*sampleUser.getUserAge()); // Max HR from literature
 
         currentUser = sampleUser;
 
